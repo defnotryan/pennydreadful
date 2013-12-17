@@ -1,6 +1,6 @@
 # Penny Dreadful
 
-FIXME
+Penny Dreadful is a free web application for writing novels. Under development.
 
 ## Prerequisites
 
@@ -16,4 +16,4 @@ To start a web server for the application, run:
 
 ## License
 
-Copyright © 2013 FIXME
+Penny Dreadful is licensed under EPL 1.0 (see epl-v10.html)

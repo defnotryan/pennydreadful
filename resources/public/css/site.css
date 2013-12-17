@@ -1,0 +1,16 @@
+#project-nav .current {
+background: #edfbff;
+border-radius: 5px;
+}
+
+#project-nav li {
+padding-left: 5px;
+}
+
+#project-nav li > div:hover {
+font-weight: bold;
+}
+
+#project-nav li > div:hover > div {
+font-weight: normal;
+}

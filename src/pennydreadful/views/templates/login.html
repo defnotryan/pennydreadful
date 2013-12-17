@@ -1,0 +1,78 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Penny Dreadful</title>
+    <link rel="stylesheet" href="../../../../resources/public/css/foundation.css" />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../../resources/public/css/site.css"/>
+    <script src="../../../../resources/public/js/modernizr.js"></script>
+    <script type="text/javascript" src="../../../../resources/public/js/jquery.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+      $(document).foundation();
+    })
+    </script>
+
+  </head>
+
+  <body>
+    <div class="fixed">
+      <nav class="top-bar" data-topbar>
+        <ul class="title-area">
+          <li class="name">
+            <h1>
+              <a href="#">
+                <i class="fa fa-book"></i>
+                Penny Dreadful
+                <small id="pd-version">v0.8.0</small>
+              </a>
+            </h1>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <h1>This is Penny Dreadful</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <div class="panel">
+            <h3>Welcome to Penny Dreadful</h3>
+          <p>Penny Dreadful is a free web application for writing novels.</p>
+        </div>
+      </div>
+    </div>
+
+    <form id="login-form" action="login" method="POST">
+      <div class="row">
+        <div class="large-4 columns">
+            <h5>Please log in:</h5>
+        </div>
+      </div>
+      <div class="row">
+        <div class="large-4 columns">
+          <input type="text" id="username" name="username" placeholder="Username"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="large-4 columns">
+          <input type="password" id="password" name="password" placeholder="Password"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="large-4 columns">
+         <a href="#" id="login-button" class="button">Log In</a>
+        </div>
+      </div>
+    </form>
+    <section class="deps">
+      <script type="text/javascript" src="../../../../resources/public/js/foundation.min.js"></script>     
+    </section>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+[
+ ;; -100000 block - users
+ {:db/id #db/id[:db.part/user -10000001]
+  :user/name "ryan"
+  :user/projects [#db/id[:db.part/user -2000001] #db/id[:db.part/user -2000002]]}
+
+ {:db/id #db/id[:db.part/user -10000002]
+  :user/name "rhea"
+  :user/projects [#db/id[:db.part/user -2000003] #db/id[:db.part/user -2000004]]}
+
+ ;; -200000 block - projects
+ {:db/id #db/id[:db.part/user -2000001]
+  :project/name "accidental astronauts"
+  :project/description "a story about accidental astronauts"
+  :project/collections [#db/id[:db.part/user -3000001] #db/id[:db.part/user -3000002]]}
+
+ {:db/id #db/id[:db.part/user -2000002]
+  :project/name "bromantic birdfeeders"
+  :project/description "a story about bromantic birdfeeders"
+  :project/collections [#db/id[:db.part/user -3000003] #db/id[:db.part/user -3000004]]}
+
+ {:db/id #db/id[:db.part/user -2000003]
+  :project/name "condescending cougars"
+  :project/description "a story about condescending cougars"
+  :project/collections [#db/id[:db.part/user -3000005] #db/id[:db.part/user -3000006]]}
+
+ {:db/id #db/id[:db.part/user -2000004]
+  :project/name "dwindling dandies"
+  :project/description "a story about dwindling dandies"
+  :project/collections [#db/id[:db.part/user -3000007] #db/id[:db.part/user -3000008]]}
+
+ ;; -3000000 block - collections
+ {:db/id #db/id[:db.part/user -3000001]
+  :collection/name "accidental astronauts manuscript"}
+
+ {:db/id #db/id[:db.part/user -3000002]
+  :collection/name "accidental astronauts research"}
+
+ {:db/id #db/id[:db.part/user -3000003]
+  :collection/name "bromantic birdfeeders manuscript"}
+
+ {:db/id #db/id[:db.part/user -3000004]
+  :collection/name "bromantic birdfeeders research"}
+
+ {:db/id #db/id[:db.part/user -3000005]
+  :collection/name "condescending cougars manuscript"}
+
+ {:db/id #db/id[:db.part/user -3000006]
+  :collection/name "condescending cougars research"}
+
+ {:db/id #db/id[:db.part/user -3000007]
+  :collection/name "dwindling dandies manuscript"}
+
+ {:db/id #db/id[:db.part/user -3000008]
+  :collection/name "dwindling dandies research"}
+
+]

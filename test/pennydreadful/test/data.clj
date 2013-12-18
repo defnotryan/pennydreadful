@@ -2,36 +2,9 @@
   (:require [expectations :refer :all]
             [datomic.api :as d]
             [clj-time.core :as time]
+            [pennydreadful.test.util :refer :all]
             [pennydreadful.data.datomic :refer :all]))
 
-(defn create-empty-in-memory-db []
-  (let [uri "datomic:mem://pennydreadful-db"]
-    (d/delete-database uri)
-    (d/create-database uri)
-    (let [conn (d/connect uri)
-          schema (load-file "resources/datomic/schema.edn")]
-      (d/transact conn schema)
-      (atom conn))))
-
-
-(defmacro with-empty-db [& body]
-  `(with-redefs [conn (create-empty-in-memory-db)]
-    ~@body))
-
-(defn create-populated-in-memory-db []
-  (let [uri "datomic:mem://pennydreadful-db"]
-    (d/delete-database uri)
-    (d/create-database uri)
-    (let [conn (d/connect uri)
-          schema (load-file "resources/datomic/schema.edn")
-          test-data (load-file "resources/datomic/test-data.edn")]
-      (d/transact conn schema)
-      (d/transact conn test-data)
-      (atom conn))))
-
-(defmacro with-populated-db [& body]
-  `(with-redefs [conn (create-populated-in-memory-db)]
-     ~@body))
 
 (def project-simple
   {:name "my new project"

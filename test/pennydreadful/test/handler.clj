@@ -6,3 +6,4 @@
 (expect 302
         (let [response (app (request :get "/"))]
           (:status response)))
+

@@ -3,6 +3,6 @@
         pennydreadful.handler)
   (:require [expectations :refer :all]))
 
-(expect 200
+(expect 302
         (let [response (app (request :get "/"))]
           (:status response)))

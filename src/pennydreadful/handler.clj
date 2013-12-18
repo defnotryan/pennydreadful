@@ -1,12 +1,12 @@
 (ns pennydreadful.handler
   (:require [compojure.core :as cj]
+            [ring.middleware.session]
             [ring.middleware.params]
             [ring.middleware.keyword-params]
             [ring.middleware.nested-params]
             [pennydreadful.routes.home :refer [home-routes]]
             [pennydreadful.routes.user :refer [user-routes]]
             [pennydreadful.util :refer [pprint-str]]
-            [noir.util.middleware :as middleware]
             [compojure.route :as route]
             [taoensso.timbre :as timbre]
             [com.postspectacular.rotor :as rotor]

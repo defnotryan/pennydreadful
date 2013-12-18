@@ -3,8 +3,6 @@
   :url "http://example.com/FIXME"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2120"]
-                 [lein-light-nrepl "0.0.4"]
-                 [lib-noir "0.7.6"]
                  [compojure "1.1.6"]
                  [ring-server "0.3.1"]
                  [liberator "0.10.0"]
@@ -21,8 +19,7 @@
                  [flyingmachine/cartographer "0.1.1"]
                  [enlive "1.1.4"]
                  [enfocus "2.0.2"]]
-  :repl-options {:nrepl-middleware [lighttable.nrepl.handler/lighttable-ops]
-                 :init-ns pennydreadful.repl}
+  :repl-options {:init-ns pennydreadful.repl}
   :aot :all
   :plugins [[lein-ring "0.8.7"]
             [lein-cljsbuild "1.0.1"]

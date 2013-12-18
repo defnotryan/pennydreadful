@@ -33,22 +33,22 @@
    :description "some other description"})
 
 (def user-ryan
-  {:name "ryan"})
+  {:username "ryan"})
 
 (def user-rhea
-  {:name "rhea"})
+  {:username "rhea"})
 
 ;; add a user
 (expect "ryan"
         (with-redefs [conn (create-empty-in-memory-db)]
           (let [inserted-user (insert-user user-ryan)]
-            (:name inserted-user))))
+            (:username inserted-user))))
 
 ;; add a user - retrieve by username
 (expect "rhea"
         (with-redefs [conn (create-empty-in-memory-db)]
           (insert-user user-rhea)
-          (:name (user-for-username "rhea"))))
+          (:username (user-for-username "rhea"))))
 
 ;; add a project
 (expect "my new project"

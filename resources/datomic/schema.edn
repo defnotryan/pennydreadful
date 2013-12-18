@@ -1,5 +1,5 @@
 [{:db/id #db/id[:db.part/db]
-  :db/ident :user/name
+  :db/ident :user/username
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db/doc "Username"

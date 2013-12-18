@@ -44,7 +44,7 @@
 
 (defmaprules ent->user
   (attr :id :db/id)
-  (attr :name :user/name)
+  (attr :username :user/username)
   (has-many :projects
             :rules ent->project
             :retriever (fn [user-ent]
@@ -95,7 +95,7 @@
 (defn user-for-username [username]
   (let [user-eid (find-one '[:find ?user-eid
                              :in $ ?username
-                             :where [?user-eid :user/name ?username]]
+                             :where [?user-eid :user/username ?username]]
                            username)]
     (mapify (d/entity (d/db @conn) user-eid) ent->user)))
 

@@ -1,11 +1,11 @@
 [
  ;; -100000 block - users
  {:db/id #db/id[:db.part/user -10000001]
-  :user/name "ryan"
+  :user/username "ryan"
   :user/projects [#db/id[:db.part/user -2000001] #db/id[:db.part/user -2000002]]}
 
  {:db/id #db/id[:db.part/user -10000002]
-  :user/name "rhea"
+  :user/username "rhea"
   :user/projects [#db/id[:db.part/user -2000003] #db/id[:db.part/user -2000004]]}
 
  ;; -200000 block - projects

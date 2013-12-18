@@ -10,3 +10,6 @@
     (.toString w)))
 
 (def not-nil? (complement nil?))
+
+(defn denil [m]
+  (into {} (remove (fn [[k v]] (nil? v)) m)))

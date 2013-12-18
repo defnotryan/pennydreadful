@@ -2,10 +2,12 @@
  ;; -100000 block - users
  {:db/id #db/id[:db.part/user -10000001]
   :user/username "ryan"
+  :user/password "$2a$10$eB/DnAFx/fsLeWfH3hWh1.XVW5trRsWKxFqKqv4dbX5fvx0sqjT.6"
   :user/projects [#db/id[:db.part/user -2000001] #db/id[:db.part/user -2000002]]}
 
  {:db/id #db/id[:db.part/user -10000002]
   :user/username "rhea"
+  :user/password "$2a$10$SpG1xJcb6N8QIqx9G4BcGuxosgpwi3TVvv8S1OzknGXhh1P7SeyxW"
   :user/projects [#db/id[:db.part/user -2000003] #db/id[:db.part/user -2000004]]}
 
  ;; -200000 block - projects

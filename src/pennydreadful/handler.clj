@@ -6,6 +6,7 @@
             [ring.middleware.nested-params]
             [pennydreadful.routes.home :refer [home-routes]]
             [pennydreadful.routes.user :refer [user-routes]]
+            [pennydreadful.auth :as pd-auth]
             [pennydreadful.util :refer [pprint-str]]
             [compojure.route :as route]
             [taoensso.timbre :as timbre]
@@ -64,13 +65,6 @@
               (throw ex))))))
     handler))
 
-(def users {"ryan" {:username "ryan"
-                    :password (creds/hash-bcrypt "Passw0rd!")
-                    :roles #{::user}}
-            "rhea" {:username "rhea"
-                    :password (creds/hash-bcrypt "woof")
-                    :roles #{::user}}})
-
 (def routes
   (apply cj/routes
          [app-routes
@@ -97,7 +91,7 @@
     :login-uri "/login"
     :default-landing-uri "/"
     :redirect-on-auth? true
-    :credential-fn (partial creds/bcrypt-credential-fn users)
+    :credential-fn (partial creds/bcrypt-credential-fn pd-auth/credentials)
     :workflows [(workflows/interactive-form)]}))
 
 (def app

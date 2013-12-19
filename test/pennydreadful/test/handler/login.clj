@@ -24,14 +24,14 @@
 (expect
  303
  (test-util/with-populated-db
-   (let [login-request (body (request :post "/login") {:username "ryan" :password "Passw0rd!"})
+   (let [login-request (body (request :post "/login") {:username "ryan" :password "passw0rd!"})
          login-response (app login-request)]
      (:status login-response))))
 
 (expect
  "/"
  (test-util/with-populated-db
-   (let [login-request (body (request :post "/login") {:username "ryan" :password "Passw0rd!"})
+   (let [login-request (body (request :post "/login") {:username "ryan" :password "passw0rd!"})
          login-response (app login-request)]
      (-> login-response
          :headers
@@ -54,9 +54,11 @@
          :headers
          (get "Location")))))
 
+;; TODO test logout
+
 ;; Authenticates as ryan and creates a function that merges the session cookie into a provided request
 (defn ryan-session [app-to-wrap]
-  (let [login-request (body (request :post "/login") {:username "ryan" :password "Passw0rd!"})
+  (let [login-request (body (request :post "/login") {:username "ryan" :password "passw0rd!"})
         login-response (app-to-wrap login-request)
         session-cookie (-> login-response
                            :headers

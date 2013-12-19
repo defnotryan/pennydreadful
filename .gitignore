@@ -8,4 +8,4 @@ pom.xml
 /.lein-*
 /.env
 *.log
-/public/resources/js/site.js
+/resources/public/js/site.js

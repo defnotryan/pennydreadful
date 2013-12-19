@@ -92,13 +92,6 @@
   (insert-map collection ent->collection {:on :project/collections
                                           :by-id (:id project)}))
 
-(defn user-for-username [username]
-  (let [user-eid (find-one '[:find ?user-eid
-                             :in $ ?username
-                             :where [?user-eid :user/username ?username]]
-                           username)]
-    (mapify (d/entity (d/db @conn) user-eid) ent->user)))
-
 (defn projects-for-user [user]
   (map #(mapify % ent->project)
     (entity-seq

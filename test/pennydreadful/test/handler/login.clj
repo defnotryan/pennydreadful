@@ -4,6 +4,24 @@
   (:require [expectations :refer :all]
             [pennydreadful.test.util :as test-util]))
 
+;; Authenticates as ryan and creates a function that merges the session cookie into a provided request
+(defn ryan-session [app-to-wrap]
+  (let [login-request (body (request :post "/login") {:username "ryan" :password "passw0rd!"})
+        login-response (app-to-wrap login-request)
+        session-cookie (-> login-response
+                           :headers
+                           (get "Set-Cookie")
+                           (first))]
+    (fn [req]
+      (let [session-req (assoc-in req [:headers "cookie"] session-cookie)]
+        (app-to-wrap session-req)))))
+
+;; Executes ~@body with pennydreadful.handler/app wrapped in session authenticator
+(defmacro as-ryan [& body]
+  `(test-util/with-populated-db
+     (with-redefs [app (ryan-session app)]
+       ~@body)))
+
 ;; Accessing "/" unauthenticated bounces to login page
 (expect
  302
@@ -18,7 +36,6 @@
      (-> response
          :headers
          (get "Location")))))
-
 
 ;; Able to log in with valid creds
 (expect
@@ -54,22 +71,19 @@
          :headers
          (get "Location")))))
 
-;; TODO test logout
+;; Not able to access protected resources after logging out
+(expect
+ 302
+ (as-ryan
+  (app (request :get "/logout"))
+  (let [response (app (request :get "/project"))]
+    (:status response))))
 
-;; Authenticates as ryan and creates a function that merges the session cookie into a provided request
-(defn ryan-session [app-to-wrap]
-  (let [login-request (body (request :post "/login") {:username "ryan" :password "passw0rd!"})
-        login-response (app-to-wrap login-request)
-        session-cookie (-> login-response
-                           :headers
-                           (get "Set-Cookie")
-                           (first))]
-    (fn [req]
-      (let [session-req (assoc-in req [:headers "cookie"] session-cookie)]
-        (app-to-wrap session-req)))))
-
-;; Executes ~@body with pennydreadful.handler/app wrapped in session authenticator
-(defmacro as-ryan [& body]
-  `(test-util/with-populated-db
-     (with-redefs [app (ryan-session app)]
-       ~@body)))
+(expect
+ #"/login$"
+ (as-ryan
+  (app (request :get "/logout"))
+  (let [response (app (request :get "/project"))]
+    (-> response
+        :headers
+        (get "Location")))))

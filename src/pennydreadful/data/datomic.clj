@@ -11,6 +11,7 @@
 
 (def uri "datomic:free://localhost:4334/pennydreadful-db")
 
+;; on a delay so we don't have to run the db just to load the ns
 (def conn (delay (d/connect uri)))
 
 (defn extant-map [m]

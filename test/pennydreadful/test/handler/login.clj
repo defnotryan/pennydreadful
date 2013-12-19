@@ -66,6 +66,7 @@
       (let [session-req (assoc-in req [:headers "cookie"] session-cookie)]
         (app-to-wrap session-req)))))
 
+;; Executes ~@body with pennydreadful.handler/app wrapped in session authenticator
 (defmacro as-ryan [& body]
   `(with-populated-db
      (with-redefs [app (ryan-session app)]

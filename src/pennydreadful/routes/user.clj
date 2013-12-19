@@ -4,6 +4,7 @@
             [liberator.core :refer [defresource]]
             [pennydreadful.util :refer [not-nil?]]
             [pennydreadful.data.datomic :as data]
+            [pennydreadful.data.user :as data-user]
             [pennydreadful.views.projects :as projects-view]))
 
 
@@ -14,7 +15,7 @@
   :handle-ok (fn [ctx]
                (let [authn (friend/current-authentication (:request ctx))
                      username (:username authn)
-                     user (data/user-for-username username)
+                     user (data-user/user-for-username username)
                      projects (data/projects-for-user user)]
                  (projects-view/render {:projects projects :username username})))
   :handle-unauthorized (fn [ctx]

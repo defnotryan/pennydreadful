@@ -2,18 +2,18 @@
   (:use ring.mock.request
         pennydreadful.handler)
   (:require [expectations :refer :all]
-            [pennydreadful.test.util :refer :all]))
+            [pennydreadful.test.util :as test-util]))
 
 ;; Accessing "/" unauthenticated bounces to login page
 (expect
  302
- (with-populated-db
+ (test-util/with-populated-db
    (let [response (app (request :get "/"))]
      (:status response))))
 
 (expect
  #"/login$"
- (with-populated-db
+ (test-util/with-populated-db
    (let [response (app (request :get "/"))]
      (-> response
          :headers
@@ -23,14 +23,14 @@
 ;; Able to log in with valid creds
 (expect
  303
- (with-populated-db
+ (test-util/with-populated-db
    (let [login-request (body (request :post "/login") {:username "ryan" :password "Passw0rd!"})
          login-response (app login-request)]
      (:status login-response))))
 
 (expect
  "/"
- (with-populated-db
+ (test-util/with-populated-db
    (let [login-request (body (request :post "/login") {:username "ryan" :password "Passw0rd!"})
          login-response (app login-request)]
      (-> login-response
@@ -40,14 +40,14 @@
 ;; Not able to log in with invalid creds
 (expect
  302
- (with-populated-db
+ (test-util/with-populated-db
    (let [login-request (body (request :post "/login") {:username "ryan" :password "WRONG!!!"})
          login-response (app login-request)]
      (:status login-response))))
 
 (expect
  #"/login\?&login_failed=Y&username=ryan$"
- (with-populated-db
+ (test-util/with-populated-db
    (let [login-request (body (request :post "/login") {:username "ryan" :password "WRONG!!!"})
          login-response (app login-request)]
      (-> login-response
@@ -68,6 +68,6 @@
 
 ;; Executes ~@body with pennydreadful.handler/app wrapped in session authenticator
 (defmacro as-ryan [& body]
-  `(with-populated-db
+  `(test-util/with-populated-db
      (with-redefs [app (ryan-session app)]
        ~@body)))

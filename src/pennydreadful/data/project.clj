@@ -22,6 +22,11 @@
         results (d/q project-eids-for-user-eid-query db user-eid)]
     (map #(hydrate (d/entity db (first %))) results)))
 
+(defn project-eids-for-user-eid [user-eid]
+  (let [db (d/db @data/conn)
+        results (d/q project-eids-for-user-eid-query db user-eid)]
+    (map first results)))
+
 (defn insert-project [user-eid project]
   (let [tempid (d/tempid :db.part/user)
         project-entity (-> project (assoc :id tempid) (dehydrate))
@@ -35,3 +40,6 @@
       (d/db)
       (d/entity project-eid)
       (hydrate)))
+
+(defn project-eid-owned-by-user-eid? [project-eid user-eid]
+  (some #{project-eid} (project-eids-for-user-eid user-eid)))

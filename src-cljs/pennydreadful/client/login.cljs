@@ -3,7 +3,7 @@
             [enfocus.events :as ee]
             [pennydreadful.client.main :as main]
             [pennydreadful.client.util :as util])
-  (:require-macros [enfocus.macros :as em]))
+  (:require-macros [enfocus.macros :refer [defaction]]))
 
 (def failure-alert
   [:div.row
@@ -15,17 +15,17 @@
   (let [login-form (.getElementById js/document "login-form")]
     (.submit login-form)))
 
-(em/defaction login-failure []
+(defaction login-failure []
   "#username" (ef/set-attr :value (:username util/query-params))
   "#password" (ef/focus)
   "#login-form" (ef/before (ef/html failure-alert)))
 
-(em/defaction setup-events []
+(defaction setup-events []
   "#login-button" (ee/listen :click submit-login)
   "#login-form" (ee/listen :keypress #(when (= 13 (.-charCode %))
                                          (submit-login))))
 
-(em/defaction setup []
+(defaction setup []
   "#username" (ef/focus))
 
 (defn ready []

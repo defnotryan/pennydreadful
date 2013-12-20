@@ -24,7 +24,10 @@
 
 (defn projects-header-location [{:keys [request] :as ctx}]
   (when (#{:post} (:request-method request))
-    (str "/project/" (get-in ctx [::project]))))
+    (str "/project/" (get-in ctx [::project :id]))))
+
+(defn projects-handle-created [ctx]
+  (projects-header-location ctx))
 
 (defresource projects-resource []
   :allowed-methods [:get :post]
@@ -33,6 +36,7 @@
   :handle-ok projects-handle-ok
   :post! projects-post!
   :location projects-header-location
+  :handle-created projects-handle-created
   :handle-unauthorized (fn [ctx]
                          (friend/throw-unauthorized nil nil)))
 

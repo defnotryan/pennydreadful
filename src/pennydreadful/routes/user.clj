@@ -8,11 +8,11 @@
             [pennydreadful.data.project :as data-project]
             [pennydreadful.views.projects :as projects-view]))
 
+(def resource-authenticated? (comp not-nil? friend/current-authentication :request))
 
 (defresource projects-resource []
   :available-media-types ["text/html"]
-  :authorized? (fn [ctx]
-                 (not-nil? (friend/current-authentication (:request ctx))))
+  :authorized? resource-authenticated?
   :handle-ok (fn [ctx]
                (let [authn (friend/current-authentication (:request ctx))
                      username (:username authn)

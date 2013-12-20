@@ -5,6 +5,7 @@
             [pennydreadful.util :refer [not-nil?]]
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.user :as data-user]
+            [pennydreadful.data.project :as data-project]
             [pennydreadful.views.projects :as projects-view]))
 
 
@@ -16,7 +17,7 @@
                (let [authn (friend/current-authentication (:request ctx))
                      username (:username authn)
                      user (data-user/user-for-username username)
-                     projects (data/projects-for-user user)]
+                     projects (data-project/projects-for-user-eid (:id user))]
                  (projects-view/render {:projects projects :username username})))
   :handle-unauthorized (fn [ctx]
                          (friend/throw-unauthorized nil nil)))

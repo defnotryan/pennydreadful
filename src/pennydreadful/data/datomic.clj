@@ -30,19 +30,6 @@
   (attr :target :collection/target)
   (attr :deadline :collection/deadline))
 
-(defmaprules ent->project
-  (attr :id :db/id)
-  (attr :name :project/name)
-  (attr :description :project/description)
-  (has-many :collections
-            :rules ent->collection
-            :retriever (fn [project-ent]
-                         (entity-seq
-                          (find-all '[:find ?coll-eid
-                                      :in $ ?project-eid
-                                      :where [?project-eid :project/collections ?coll-eid]]
-                                    (:db/id project-ent))))))
-
 (defmaprules ent->user
   (attr :id :db/id)
   (attr :username :user/username)
@@ -85,21 +72,11 @@
 (defn insert-user [user]
   (insert-map user ent->user))
 
-(defn insert-project [user project]
-  (insert-map project ent->project {:on :user/projects
-                                    :by-id (:id user)}))
 
 (defn insert-collection [project collection]
   (insert-map collection ent->collection {:on :project/collections
                                           :by-id (:id project)}))
 
-(defn projects-for-user [user]
-  (map #(mapify % ent->project)
-    (entity-seq
-     (find-all '[:find ?project-eid
-                 :in $ ?user-eid
-                 :where [?user-eid :user/projects ?project-eid]]
-               (:id user)))))
 
 (defn collections-for-project-eid [project-eid]
   (map #(mapify % ent->collection)

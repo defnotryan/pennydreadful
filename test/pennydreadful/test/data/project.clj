@@ -18,7 +18,7 @@
  (with-populated-db
    (let [ryan (data-user/user-for-username "ryan")
          ryan-eid (:id ryan)]
-     (insert-project ryan-eid {:name "catatonic catamounts" :description "desc"})
+     (insert-project! ryan-eid {:name "catatonic catamounts" :description "desc"})
      (let [projects (projects-for-user-eid ryan-eid)]
        (into #{} (map :name projects))))))
 
@@ -27,7 +27,7 @@
  (in
   (with-populated-db
     (let [ryan (data-user/user-for-username "ryan")]
-      (insert-project
+      (insert-project!
        (:id ryan)
        {:name "catatonic catamounts"
         :description "a story about catatonic catamounts"})))))
@@ -36,5 +36,5 @@
  identity ;; expect truthy
  (with-populated-db
    (let [ryan (data-user/user-for-username "ryan")
-         project (insert-project (:id ryan) {:name "surreal serpents" :description "sssurreal ssserpentsss"})]
+         project (insert-project! (:id ryan) {:name "surreal serpents" :description "sssurreal ssserpentsss"})]
      (project-eid-owned-by-user-eid? (:id project) (:id ryan)))))

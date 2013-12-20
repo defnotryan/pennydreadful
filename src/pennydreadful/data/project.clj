@@ -30,7 +30,7 @@
         results (d/q project-eids-for-user-eid-query db user-eid)]
     (map first results)))
 
-(defn insert-project [user-eid project]
+(defn insert-project! [user-eid project]
   (let [tempid (d/tempid :db.part/user)
         project-entity (-> project (assoc :id tempid) (dehydrate))
         facts [project-entity {:db/id user-eid :user/projects tempid}]

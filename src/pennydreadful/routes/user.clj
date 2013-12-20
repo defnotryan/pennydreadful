@@ -19,7 +19,7 @@
 (defn projects-post! [{:keys [request] :as ctx}]
   (let [authn (friend/current-authentication request)
         project (:params request)
-        inserted-project (data-project/insert-project (:id authn) project)]
+        inserted-project (data-project/insert-project! (:id authn) project)]
      {::project inserted-project}))
 
 (defn projects-header-location [{:keys [request] :as ctx}]

@@ -1,16 +1,19 @@
 (ns pennydreadful.data.project
   (:require [datomic.api :as d]
+            [pennydreadful.util :refer [denil]]
             [pennydreadful.data.datomic :as data]))
 
 (defn- dehydrate [project]
-  {:db/id (:id project)
-   :project/name (:name project)
-   :project/description (:description project)})
+  (denil
+    {:db/id (:id project)
+     :project/name (:name project)
+     :project/description (:description project)}))
 
 (defn- hydrate [project-entity]
-  {:id (:db/id project-entity)
-   :name (:project/name project-entity)
-   :description (:project/description project-entity)})
+  (denil
+    {:id (:db/id project-entity)
+     :name (:project/name project-entity)
+     :description (:project/description project-entity)}))
 
 (def project-eids-for-user-eid-query
   '[:find ?project-eid

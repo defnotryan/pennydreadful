@@ -1,6 +1,6 @@
 # Penny Dreadful
 
-Penny Dreadful is a free web application for writing novels. Under development.
+Penny Dreadful is an open-source web application for writing novels. Under development.
 
 ## Prerequisites
 

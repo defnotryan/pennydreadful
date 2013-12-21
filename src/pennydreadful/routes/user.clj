@@ -2,7 +2,8 @@
   (:use compojure.core)
   (:require [cemerick.friend :as friend]
             [liberator.core :refer [defresource]]
-            [pennydreadful.util :refer [not-nil?]]
+            [pennydreadful.util :refer [not-nil? parse-long]]
+            [pennydreadful.auth :as auth]
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.user :as data-user]
             [pennydreadful.data.project :as data-project]
@@ -40,8 +41,23 @@
   :handle-unauthorized (fn [ctx]
                          (friend/throw-unauthorized nil nil)))
 
+(defn resource-mutation-allowed? [project-eid {:keys [request]}]
+  (auth/user-eid-can-mutate-project-eid?
+   (:id (friend/current-authentication request))
+   project-eid))
+
+(defn project-delete! [project-eid ctx]
+  (data-project/delete-project! project-eid))
+
+(defresource project-resource [project-eid]
+  :allowed-methods [:delete] ; TODO :get :put
+  :authorized? #(resource-mutation-allowed? project-eid %)
+  :delete! #(project-delete! project-eid %))
+
 (defroutes user-routes
 
   (GET "/" [] (projects-resource))
 
-  (ANY "/project" [] (projects-resource)))
+  (ANY "/project" [] (projects-resource))
+
+  (ANY "/project/:project-eid" [project-eid] (project-resource (parse-long project-eid))))

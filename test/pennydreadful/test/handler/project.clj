@@ -1,6 +1,7 @@
 (ns pennydreadful.test.handler.project
   (:require [expectations :refer :all]
             [ring.mock.request :refer :all]
+            [clojure.edn :as edn]
             [pennydreadful.handler :refer [app]]
             [pennydreadful.test.util :refer :all]
             [pennydreadful.data.user :as data-user]
@@ -51,3 +52,26 @@
   (let [ryan (data-user/user-for-username "ryan")
         projects (data-project/projects-for-user-eid (:id ryan))]
     (into #{} (map :name projects)))))
+
+;; Delete project
+(expect
+ 204
+ (login/as-ryan
+  (post-new {:name "Ke$ha: An autobiography" :description "I woke up in the morning feeling like P Diddy..."})
+  (let [war-and-peace-response (post-new {:name "War and Peace" :description "A very meaningful novel."})
+        war-and-peace (edn/read-string (:body war-and-peace-response))
+        war-and-peace-eid (:id war-and-peace)
+        delete-response (app (request :delete (str "/project/" war-and-peace-eid)))]
+    (:status delete-response))))
+
+(expect
+ #{"accidental astronauts" "bromantic birdfeeders" "Ke$ha: An autobiography"}
+ (login/as-ryan
+  (post-new {:name "Ke$ha: An autobiography" :description "I woke up in the morning feeling like P Diddy..."})
+  (let [war-and-peace-response (post-new {:name "War and Peace" :description "A very meaningful novel."})
+        war-and-peace (edn/read-string (:body war-and-peace-response))
+        war-and-peace-eid (:id war-and-peace)
+        delete-response (app (request :delete (str "/project/" war-and-peace-eid)))]
+    (let [ryan (data-user/user-for-username "ryan")
+          projects (data-project/projects-for-user-eid (:id ryan))]
+      (into #{} (map :name projects))))))

@@ -32,9 +32,23 @@
        {:name "catatonic catamounts"
         :description "a story about catatonic catamounts"})))))
 
+;; Ownership
 (expect
  identity ;; expect truthy
  (with-populated-db
    (let [ryan (data-user/user-for-username "ryan")
          project (insert-project! (:id ryan) {:name "surreal serpents" :description "sssurreal ssserpentsss"})]
      (project-eid-owned-by-user-eid? (:id project) (:id ryan)))))
+
+;; Delete a project
+(expect
+ #{"accidental astronauts" "bromantic birdfeeders" "Ke$ha: An autobiography"}
+ (with-populated-db
+   (let [ryan (data-user/user-for-username "ryan")
+         ryan-eid (:id ryan)
+         war-and-peace (insert-project! ryan-eid {:name "War and Peace" :description "A very meaningful novel"})
+         kesha (insert-project! ryan-eid {:name "Ke$ha: An autobiography" :description "I woke up in the morning feeling like P Diddy..."})]
+     (delete-project! (:id war-and-peace))
+     (let [projects (projects-for-user-eid ryan-eid)]
+       (into #{} (map :name projects))))))
+

@@ -13,3 +13,6 @@
 
 (defn denil [m]
   (into {} (remove (fn [[k v]] (nil? v)) m)))
+
+(defn parse-long [s]
+  (Long/parseLong s))

@@ -18,6 +18,7 @@
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db/doc "A user's projects"
+  :db/isComponent true
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
@@ -40,6 +41,7 @@
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db/doc "A project's collections"
+  :db/isComponent true
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
@@ -75,6 +77,7 @@
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db/doc "The collection's top-level items"
+  :db/isComponent true
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
@@ -103,6 +106,7 @@
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
   :db/doc "The folder's contained items"
+  :db/isComponent true
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]

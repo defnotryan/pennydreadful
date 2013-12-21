@@ -46,3 +46,6 @@
 
 (defn project-eid-owned-by-user-eid? [project-eid user-eid]
   (some #{project-eid} (project-eids-for-user-eid user-eid)))
+
+(defn delete-project! [project-eid]
+  @(d/transact @data/conn [[:db.fn/retractEntity project-eid]]))

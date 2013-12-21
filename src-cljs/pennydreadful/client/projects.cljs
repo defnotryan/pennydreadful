@@ -3,12 +3,19 @@
             [enfocus.events :as ee]
             [clojure.string :refer [blank?]]
             [cljs.core.async :as async :refer [<!]]
+            [cljs.reader :as reader]
             [tailrecursion.javelin :as jav]
             [pennydreadful.client.main :as main]
             [pennydreadful.client.util :refer [POST+ log]])
-  (:require-macros [enfocus.macros :refer [defaction]]
+  (:require-macros [enfocus.macros :refer [defaction defsnippet]]
                    [tailrecursion.javelin :refer [defc defc= cell=]]
                    [cljs.core.async.macros :refer [go]]))
+
+(defsnippet project-panel :compiled "src/pennydreadful/views/templates/projects.html"
+  "#project-list > *:first-child"
+  [{project-title :name project-description :description}]
+  ".project-title" (ef/content project-title)
+  ".project-description" (ef/content project-description))
 
 (defaction enable-new-project-button []
   "#create-project-button" (ef/remove-class "disabled"))
@@ -28,9 +35,17 @@
 (defn post-new-project! [m]
   (go (<! (POST+ "/project" {:params m}))))
 
+(defaction add-project-panel [project]
+  "#project-list" (ef/prepend (project-panel project)))
+
 (defn create-project! []
-  (let [new-project-uri (post-new-project! {:name @new-project-name :description "Type here to add a description."})]
-     (log new-project-uri)))
+  (go
+    (let [new-project-edn (<! (post-new-project! {:name @new-project-name :description "Type here to add a description."}))
+          new-project (reader/read-string new-project-edn)]
+      (add-project-panel new-project)
+      (reset! new-project-name "")
+      (ef/at "#new-project-name-input" (ef/set-prop :value ""))
+      (.scroll js/window 0 0))))
 
 (defn new-project-name-change [event]
   (reset! new-project-name (-> event .-target .-value)))

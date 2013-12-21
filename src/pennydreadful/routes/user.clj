@@ -27,7 +27,7 @@
     (str "/project/" (get-in ctx [::project :id]))))
 
 (defn projects-handle-created [ctx]
-  (projects-header-location ctx))
+  (pr-str (::project ctx)))
 
 (defresource projects-resource []
   :allowed-methods [:get :post]

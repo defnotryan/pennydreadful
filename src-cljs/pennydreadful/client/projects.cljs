@@ -38,14 +38,17 @@
 (defaction add-project-panel [project]
   "#project-list" (ef/prepend (project-panel project)))
 
+(defn reset-new-project []
+  (ef/at "#new-project-name-input" (ef/set-prop :value ""))
+  (reset! new-project-name "")
+  (.scroll js/window 0 0))
+
 (defn create-project! []
   (go
     (let [new-project-edn (<! (post-new-project! {:name @new-project-name :description "Type here to add a description."}))
           new-project (reader/read-string new-project-edn)]
       (add-project-panel new-project)
-      (reset! new-project-name "")
-      (ef/at "#new-project-name-input" (ef/set-prop :value ""))
-      (.scroll js/window 0 0))))
+      (reset-new-project))))
 
 (defn new-project-name-change [event]
   (reset! new-project-name (-> event .-target .-value)))

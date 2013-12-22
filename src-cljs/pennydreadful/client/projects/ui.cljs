@@ -64,7 +64,11 @@
     (go (>! data/projects-to-create {:name @new-project-name :description "Type here to add a description."}))))
 
 (defn keyup>new-project-name [event]
+  ;; TODO capture "enter" key and prevent form submit?
   (reset! new-project-name (-> event .-target .-value)))
+
+;; TODO handle change>new-project-name (will this handle pasting?)
+;; TODO handle blur>new-project-name
 
 (defaction setup-events []
   "body" (ee/listen-live :click ".delete-confirm" click>delete-confirm)
@@ -103,7 +107,6 @@
      (log response))))
 
 ;; Handle projects created
-(declare project-panel)
 (go
  (while true
    (let [{project-eid :id :as project} (<! data/created-projects)]

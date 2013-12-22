@@ -20,6 +20,11 @@
 (defn extract-id [node]
   (ef/from node (ef/get-attr :data-id)))
 
+(defn show-spinner []
+  (ef/at "#spinner" (ef/remove-class "hide")))
+
+(defn hide-spinner []
+  (ef/at "#spinner" (ef/add-class "hide")))
 
 ;; Ajax stuff
 

@@ -5,7 +5,7 @@
 
 (def template-path "pennydreadful/views/templates/projects.html")
 
-(def cljs-launch-ns "pennydreadful.client.projects")
+(def cljs-launch-ns "pennydreadful.client.projects.ui")
 
 (defsnippet project-panel template-path [:#project-list :> first-child]
   [{project-title :name project-description :description project-eid :id}]

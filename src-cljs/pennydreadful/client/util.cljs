@@ -1,9 +1,9 @@
 (ns pennydreadful.client.util
   (:require [clojure.string :as string]
             [enfocus.core :as ef]
-            [ajax.core :refer [GET POST PUT]]
-            [cljs.core.async :as async :refer [chan put! close!]])
-  (:require-macros [cljs.core.async.macros :refer [go alt!]]))
+            [ajax.core]
+            [tailrecursion.javelin])
+  (:require-macros [tailrecursion.javelin :refer [defc defc=]]))
 
 (defn log [anything]
   (.log js/console anything))
@@ -17,27 +17,15 @@
 
 (def query-params (parse-params (.-location js/window)))
 
-(defn- ajax-async-wrap [METHOD]
-  (fn [uri options]
-    (let [ch (chan 1)]
-      (METHOD uri (merge options
-                    {:format :raw ;;TODO would love to use edn
-                     :response-format :raw  ;;TODO would love to use edn
-                     :handler (fn [resp]
-                                (put! ch resp)
-                                (close! ch))
-                     :error-handler (fn [resp]
-                                      (put! ch resp)
-                                      (close! ch))}))
-      ch)))
+(defn extract-id [node]
+  (ef/from node (ef/get-attr :data-id)))
+
+
+;; Ajax stuff
 
 (defn DELETE [uri & [opts]]
   (ajax.core/ajax-request uri "DELETE" (ajax.core/transform-opts opts)))
 
-(def GET+ (ajax-async-wrap GET))
-(def POST+ (ajax-async-wrap POST))
-(def PUT+ (ajax-async-wrap PUT))
-(def DELETE+ (ajax-async-wrap DELETE))
+(defc outstanding-request-count 0)
 
-(defn extract-id [node]
-  (ef/from node (ef/get-attr :data-id)))
+(defc= requests-outstanding? (pos? outstanding-request-count))

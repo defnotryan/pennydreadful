@@ -51,6 +51,7 @@
 
 (defresource project-resource [project-eid]
   :allowed-methods [:delete] ; TODO :get :put
+  :available-media-types ["text/html"]
   :authorized? #(resource-mutation-allowed? project-eid %)
   :delete! #(project-delete! project-eid %))
 

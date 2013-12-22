@@ -1,6 +1,7 @@
 (ns pennydreadful.client.util
   (:require [clojure.string :as string]
-            [ajax.core :refer [GET POST PUT DELETE]]
+            [enfocus.core :as ef]
+            [ajax.core :refer [GET POST PUT]]
             [cljs.core.async :as async :refer [chan put! close!]])
   (:require-macros [cljs.core.async.macros :refer [go alt!]]))
 
@@ -30,7 +31,13 @@
                                       (close! ch))}))
       ch)))
 
+(defn DELETE [uri & [opts]]
+  (ajax.core/ajax-request uri "DELETE" (ajax.core/transform-opts opts)))
+
 (def GET+ (ajax-async-wrap GET))
 (def POST+ (ajax-async-wrap POST))
 (def PUT+ (ajax-async-wrap PUT))
 (def DELETE+ (ajax-async-wrap DELETE))
+
+(defn extract-id [node]
+  (ef/from node (ef/get-attr :data-id)))

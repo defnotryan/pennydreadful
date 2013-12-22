@@ -53,30 +53,43 @@
     <div class="large-6 large-offset-3 columns">
       <h2>All Projects</h2>
       <div id="project-list">
-        <div class="project panel">
+        <div class="project panel" id="project-panel-1111">
           <h3 class="project-title">Accidental Astronauts</h3>
           <p class="project-description">Tonx fixie American Apparel, wolf eiusmod cred art party XOXO. In assumenda anim hashtag aliquip, delectus ex. Bitters consequat cillum post-ironic. Whatever YOLO viral minim, shabby chic farm-to-table paleo craft beer selfies. Austin voluptate kogi, aesthetic cornhole scenester laborum irure quinoa flannel sriracha minim.</p>
           <div class="row">
-            <div class="large-12 columns">
-              <ul class="button-group">
-                <li><a href="#" class="small alert button project-delete-link"><i class="fa fa-trash-o"></i> Delete</a></li>
-                <li><a href="#" class="small button project-compile-link"><i class="fa fa-book"></i> Compile</a></li>
-                <li><a href="#" class="small button project-export-link"><i class="fa fa-cloud-download"></i> Export</a></li>
-                <li><a href="#" class="small success button project-write-link"><i class="fa fa-pencil"></i> Write!</a></li>
+            <div class="large-12 columns clearfix">
+              <ul class="button-group right">
+                <li><a data-reveal-id="delete-confirmation-1111" class="small alert button project-delete-link"><i class="fa fa-trash-o"></i> Delete</a></li>
+                <li><a class="small button project-compile-link"><i class="fa fa-book"></i> Compile</a></li>
+                <li><a class="small button project-export-link"><i class="fa fa-cloud-download"></i> Export</a></li>
+                <li><a class="small success button project-write-link"><i class="fa fa-pencil"></i> Write!</a></li>
               </ul>
             </div>
+          </div>
+          <div id="delete-confirmation-1111" class="reveal-modal small" data-reveal>
+            <h2>Delete project?</h2>
+            <p>Are you sure you want to delete your project <em>Accidental Astronauts</em>? This action cannot be undone.</p>
+            <div class="row">
+              <div class="large-12 columns clearfix">
+                <ul class="button-group right">
+                  <li><a class="button delete-nevermind" data-id="1111"><i class="fa fa-meh-o"></i> Never Mind</a></li>
+                  <li><a class="alert button delete-confirm" data-id="1111"><i class="fa fa-trash-o"></i> Yes, Delete</a></li>
+                </ul>
+              </div>
+            </div>
+            <a class="close-reveal-modal">&#215;</a>
           </div>
         </div>
         <div class="project panel">
           <h3>Bromantic Birdfeeders</h3>
           <p>Ugh letterpress bespoke keytar, keffiyeh Wes Anderson flexitarian quinoa laboris actually pour-over id dreamcatcher velit exercitation. Authentic master cleanse voluptate hoodie, Vice Wes Anderson fugiat fanny pack pork belly McSweeney's gluten-free chambray scenester.</p>
           <div class="row">
-            <div class="large-12 columns">
-              <ul class="button-group">
-                <li><a href="#" class="small alert button"><i class="fa fa-trash-o"></i> Delete</a></li>
-                <li><a href="#" class="small button"><i class="fa fa-book"></i> Compile</a></li>
-                <li><a href="#" class="small button"><i class="fa fa-cloud-download"></i> Export</a></li>
-                <li><a href="#" class="small success button"><i class="fa fa-pencil"></i> Write!</a></li>
+            <div class="large-12 columns clearfix">
+              <ul class="button-group right">
+                <li><a class="small alert button"><i class="fa fa-trash-o"></i> Delete</a></li>
+                <li><a class="small button"><i class="fa fa-book"></i> Compile</a></li>
+                <li><a class="small button"><i class="fa fa-cloud-download"></i> Export</a></li>
+                <li><a class="small success button"><i class="fa fa-pencil"></i> Write!</a></li>
               </ul>
             </div>
           </div>

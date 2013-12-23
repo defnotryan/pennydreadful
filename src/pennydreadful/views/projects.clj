@@ -11,7 +11,7 @@
   [{project-title :name project-description :description project-eid :id}]
   [:.project] (set-attr :id (str "project-panel-" project-eid))
   [:.project-title] (content project-title)
-  [:.project-description] (content project-description)
+  [:.project-description] (html-content project-description)
   [:.project-write-link] (set-attr :href (str "/project/" project-eid))
   [:.project-delete-link] (set-attr :data-reveal-id (str "delete-confirmation-" project-eid))
   [:.reveal-modal] (set-attr :id (str "delete-confirmation-" project-eid))

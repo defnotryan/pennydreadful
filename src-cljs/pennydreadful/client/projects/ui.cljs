@@ -30,7 +30,7 @@
   [{project-title :name project-description :description project-eid :id}]
   ".project" (ef/set-attr :id (str "project-panel-" project-eid))
   ".project-title" (ef/do-> (ef/content project-title) (ef/set-attr :data-id project-eid))
-  ".project-description" (ef/content project-description)
+  ".project-description" (ef/html-content project-description) ;; TODO still fussy/buggy
   ".project-write-link" (ef/set-attr :href (str "/project/" project-eid))
   ".project-delete-link" (ef/set-attr :data-reveal-id (str "delete-confirmation-" project-eid))
   ".reveal-modal" (ef/set-attr :id (str "delete-confirmation-" project-eid))
@@ -70,6 +70,7 @@
     (close-confirm-modal project-eid)))
 
 (defn prepare-content-string [s default-string]
+  (log s)
   (let [trimmed-string (trim s)]
     (if (blank? trimmed-string)
       default-string
@@ -97,7 +98,32 @@
           (swap! handlers assoc project-eid (make-project-title-input-handler project-eid)))
         ((@handlers project-eid) event)))))
 
+(defn make-project-description-input-handler [project-eid]
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/project-descriptions-to-update
+           {:id project-eid :description (prepare-content-string (-> event .-target .-innerHTML) "Type here to add a description")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:project-description project-eid])
+     event)))
+
+(def input>project-description
+  (let [handlers (atom {})]
+    (fn [event]
+      (let [project-eid (extract-id (.-target event))]
+        (when-not (@handlers project-eid)
+          (swap! handlers assoc project-eid (make-project-description-input-handler project-eid)))
+        ((@handlers project-eid) event)))))
+
 (defn keydown>project-title [event]
+  (when (= 13 (.-keyCode event))
+    (.preventDefault event)
+    (.blur (.-target event))))
+
+(defn keydown>project-description [event]
   (when (= 13 (.-keyCode event))
     (.preventDefault event)
     (.blur (.-target event))))
@@ -123,7 +149,9 @@
   "body" (ee/listen-live :click ".delete-confirm" click>delete-confirm)
   "body" (ee/listen-live :click ".delete-nevermind" click>delete-nevermind)
   "body" (ee/listen-live :input ".project-title" input>project-title)
+  "body" (ee/listen-live :input ".project-description" input>project-description)
   ".project-title" (ee/listen :keydown keydown>project-title) ;; listen-live doesn't give us .-keyCode :(
+  ;".project-description" (ee/listen :keydown keydown>project-description)
   "#create-project-button" (ee/listen :click click>create-project)
   "#new-project-name-input" (ee/listen :keyup keyup>new-project-name)
   "#new-project-name-input" (ee/listen :change change>new-project-name)
@@ -199,4 +227,23 @@
 (go
  (while true
    (let [response (<! data/update-project-title-errors)]
+     (log response))))
+
+
+;; Handle project description updates
+(go
+ (while true
+   (let [project (<! data/updated-project-descriptions)
+         project-eid (-> project :id str)
+         project-description (:description project)]
+     (swap! unsaved-changes disj [:project-description project-eid])
+     (let [selector (str "#project-panel-" project-eid " .project-description")
+           current-description (ef/from selector (ef/get-text))]
+       (when-not (= project-description current-description)
+         (ef/at selector (ef/html-content project-description)))))))
+
+;; Handle project description update errors
+(go
+ (while true
+   (let [response (<! data/update-project-description-errors)]
      (log response))))

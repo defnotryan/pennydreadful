@@ -188,3 +188,9 @@
            current-title (ef/from selector (ef/get-text))]
        (when-not (= (:name project) current-title)
          (ef/at selector (ef/content (:name project))))))))
+
+;; Handle project title update errors
+(go
+ (while true
+   (let [response (<! data/update-project-title-errors)]
+     (log response))))

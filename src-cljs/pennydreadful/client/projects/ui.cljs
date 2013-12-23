@@ -121,7 +121,7 @@
   "body" (ee/listen-live :click ".delete-confirm" click>delete-confirm)
   "body" (ee/listen-live :click ".delete-nevermind" click>delete-nevermind)
   "body" (ee/listen-live :input ".project-title" input>project-title)
-  ".project-title" (ee/listen :keydown keydown>project-title) ;; listen-live doesn't give us .-keyCode? also, we want each title debounced separately
+  ".project-title" (ee/listen :keydown keydown>project-title) ;; listen-live doesn't give us .-keyCode :(
   "#create-project-button" (ee/listen :click click>create-project)
   "#new-project-name-input" (ee/listen :keyup keyup>new-project-name)
   "#new-project-name-input" (ee/listen :change change>new-project-name)

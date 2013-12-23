@@ -10,7 +10,7 @@
 (defsnippet project-panel template-path [:#project-list :> first-child]
   [{project-title :name project-description :description project-eid :id}]
   [:.project] (set-attr :id (str "project-panel-" project-eid))
-  [:.project-title] (content project-title)
+  [:.project-title] (do-> (content project-title) (set-attr :data-id project-eid))
   [:.project-description] (content project-description)
   [:.project-write-link] (set-attr :href (str "/project/" project-eid))
   [:.project-delete-link] (set-attr :data-reveal-id (str "delete-confirmation-" project-eid))

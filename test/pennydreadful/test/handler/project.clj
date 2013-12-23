@@ -102,7 +102,7 @@
          dauntless (edn/read-string (:body dauntless-response))
          dauntless-eid (:id dauntless)]
      (-> (request :put (str "/project/" dauntless-eid))
-         (body (assoc dauntless :description "no daunts here"))
+         (body {:id dauntless-eid :description "no daunts here"}) ;; leave :name empty, expect it will be unchanged
          app)
      (data-project/project-by-eid dauntless-eid)))))
 

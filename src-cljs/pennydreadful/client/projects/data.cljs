@@ -15,9 +15,9 @@
 (def deleted-project-eids (chan 1))
 (def delete-project-errors (chan 1))
 
-(def projects-to-update (chan 1))
-(def updated-projects (chan 1))
-(def update-projects-errors (chan 1))
+(def project-titles-to-update (chan 1))
+(def updated-project-titles (chan 1))
+(def update-project-title-errors (chan 1))
 
 ;; POST new projects in projects-to-create channel
 (go
@@ -47,3 +47,19 @@
               :error-handler (fn [resp]
                                (go (>! delete-project-errors resp)))
               :finally #(swap! util/outstanding-request-count dec)}))))
+
+
+;; PUT project title updates in project-titles-to-update channel
+(go
+ (while true
+   (let [project (<! project-titles-to-update)]
+     (swap! util/outstanding-request-count inc)
+     (PUT (str "/project/" (:id project))
+          {:format :raw
+           :response-format :raw
+           :params project
+           :handler (fn [_]
+                      (go (>! updated-project-titles project)))
+           :error-handler (fn [resp]
+                            (go (>! update-project-title-errors resp)))
+           :finally #(swap! util/outstanding-request-count dec)}))))

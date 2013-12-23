@@ -55,9 +55,9 @@
   (data-project/delete-project! project-eid))
 
 (defresource project-resource [project-eid]
-  :allowed-methods [:delete :put] ; TODO :get :put
+  :allowed-methods [:delete :put] ; TODO :get
   :available-media-types ["text/html"]
-  :authorized? #(resource-mutation-allowed? project-eid %)
+  :authorized? #(resource-mutation-allowed? project-eid %) ;; also enforces that project-eid exists
   :put! #(project-put! project-eid %)
   :delete! #(project-delete! project-eid %))
 

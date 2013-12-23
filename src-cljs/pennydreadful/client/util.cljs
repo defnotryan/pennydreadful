@@ -26,6 +26,13 @@
 (defn hide-spinner []
   (ef/at "#spinner" (ef/add-class "hide")))
 
+(defn debounce
+  ([f wait]
+   (debounce f wait false))
+  ([f wait immediate]
+   (.debounce js/_ f wait immediate)))
+
+
 ;; Ajax stuff
 
 (defn DELETE [uri & [opts]]

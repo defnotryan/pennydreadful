@@ -48,8 +48,8 @@
         </ul>
         <section class="top-bar-section">
           <ul class="left">
-            <li>
-              <a><span id="spinner" class="hide"/></a>
+            <li class="name">
+              <span id="spinner" class="hide"></span>
             </li>
           </ul>
           <ul class="right">
@@ -71,11 +71,24 @@
     </div>
 
     <div class="large-6 large-offset-3 columns">
-      <h2>All Projects</h2>
+    <div class="row">
+      <div class="large-11 columns">
+        <h2>All Projects</h2>
+      </div>
+      <div class="large-1 columns text-right">
+        <h2 id="changes-flag" class="hide">
+          <small>
+            <span data-tooltip class="has-tip" title="Your changes will be saved soon. Do not navigate away until this icon disappears.">
+              <i class="fa fa-bolt"></i>
+            </span>
+          </small>
+        </h2>
+      </div>
+    </div>
       <div id="project-list">
         <div class="project panel" id="project-panel-1111">
-          <h3 class="project-title">Accidental Astronauts</h3>
-          <p class="project-description">Tonx fixie American Apparel, wolf eiusmod cred art party XOXO. In assumenda anim hashtag aliquip, delectus ex. Bitters consequat cillum post-ironic. Whatever YOLO viral minim, shabby chic farm-to-table paleo craft beer selfies. Austin voluptate kogi, aesthetic cornhole scenester laborum irure quinoa flannel sriracha minim.</p>
+          <h3><span class="project-title" data-id="1111" contenteditable="true">Accidental Astronauts</span></h3>
+          <p class="project-description" contenteditable="true">Tonx fixie American Apparel, wolf eiusmod cred art party XOXO. In assumenda anim hashtag aliquip, delectus ex. Bitters consequat cillum post-ironic. Whatever YOLO viral minim, shabby chic farm-to-table paleo craft beer selfies. Austin voluptate kogi, aesthetic cornhole scenester laborum irure quinoa flannel sriracha minim.</p>
           <div class="row">
             <div class="large-12 columns clearfix">
               <ul class="button-group right">

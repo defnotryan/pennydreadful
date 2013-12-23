@@ -9,6 +9,7 @@
   [[:link (attr-ends :href "site.css")]] (set-attr :href "/css/site.css")
   [[:script (attr-ends :src "modernizr.js")]] (set-attr :src "/js/modernizr.js")
   [[:script (attr-ends :src "jquery.js")]] (set-attr :src "/js/jquery.js")
+  [[:script (attr-ends :src "spin.min.js")]] (set-attr :src "/js/spin.min.js")
   [[:script (attr-ends :src "site.js")]] (set-attr :src "/js/site.js")
   [:script#launch] (content (str cljs-launch-ns ".init()")))
 

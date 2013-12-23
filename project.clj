@@ -3,6 +3,7 @@
   :url "http://example.com/FIXME"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2120"]
+                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [compojure "1.1.6"]
                  [ring-server "0.3.1"]
                  [liberator "0.10.0"]
@@ -18,7 +19,9 @@
                  [com.datomic/datomic-free "0.8.4260"]
                  [flyingmachine/cartographer "0.1.1"]
                  [enlive "1.1.4"]
-                 [enfocus "2.0.2"]]
+                 [enfocus "2.0.2"]
+                 [cljs-ajax "0.2.3"]
+                 [tailrecursion/javelin "2.4.0"]]
   :repl-options {:init-ns pennydreadful.repl}
   :aot :all
   :plugins [[lein-ring "0.8.7"]

@@ -8,4 +8,4 @@
   (data-user/user-for-username username))
 
 (defn user-eid-can-mutate-project-eid? [user-eid project-eid]
-  (not-nil? (data-project/project-eid-owned-by-user-eid? user-eid project-eid)))
+  (not-nil? (data-project/project-eid-owned-by-user-eid? project-eid user-eid)))

@@ -64,17 +64,25 @@
     (go (>! data/projects-to-create {:name @new-project-name :description "Type here to add a description."}))))
 
 (defn keyup>new-project-name [event]
-  ;; TODO capture "enter" key and prevent form submit?
   (reset! new-project-name (-> event .-target .-value)))
 
-;; TODO handle change>new-project-name (will this handle pasting?)
-;; TODO handle blur>new-project-name
+(defn change>new-project-name [event]
+  (reset! new-project-name (-> event .-target .-value)))
+
+;; TODO handle blur>new-project-name?
+
+(defn submit>new-project-form [event]
+  (.preventDefault event)
+  (when @new-project-name-valid?
+    (go (>! data/projects-to-create {:name @new-project-name :description "Type here to add a description."}))))
 
 (defaction setup-events []
   "body" (ee/listen-live :click ".delete-confirm" click>delete-confirm)
   "body" (ee/listen-live :click ".delete-nevermind" click>delete-nevermind)
   "#create-project-button" (ee/listen :click click>create-project)
-  "#new-project-name-input" (ee/listen :keyup keyup>new-project-name))
+  "#new-project-name-input" (ee/listen :keyup keyup>new-project-name)
+  "#new-project-name-input" (ee/listen :change change>new-project-name)
+  "#new-project-form" (ee/listen :submit submit>new-project-form))
 
 
 ;; Initialize

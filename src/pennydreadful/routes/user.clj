@@ -46,13 +46,19 @@
    (:id (friend/current-authentication request))
    project-eid))
 
+(defn project-put! [project-eid ctx]
+  (let [project (-> ctx :request :params)
+        safe-project (assoc project :id project-eid)]
+    (data-project/update-project! safe-project)))
+
 (defn project-delete! [project-eid ctx]
   (data-project/delete-project! project-eid))
 
 (defresource project-resource [project-eid]
-  :allowed-methods [:delete] ; TODO :get :put
+  :allowed-methods [:delete :put] ; TODO :get :put
   :available-media-types ["text/html"]
   :authorized? #(resource-mutation-allowed? project-eid %)
+  :put! #(project-put! project-eid %)
   :delete! #(project-delete! project-eid %))
 
 (defroutes user-routes

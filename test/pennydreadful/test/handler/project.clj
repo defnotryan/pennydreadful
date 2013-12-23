@@ -36,13 +36,11 @@
 
 ;; Post to project returns location of new project
 (expect
- #"/project/.+"
+ #"/project/[0-9]+"
  (login/as-ryan
   (let [response (post-new {:name "deletrious debut"})]
     (get-in response [:headers "Location"]))))
 
-
-;; TODO test that returned URI is valid
 
 ;; Post to project actually adds project to database
 (expect
@@ -54,6 +52,7 @@
     (into #{} (map :name projects)))))
 
 ;; Delete project
+;; Ensure URI returned from POST is valid
 (expect
  204
  (login/as-ryan
@@ -75,3 +74,67 @@
     (let [ryan (data-user/user-for-username "ryan")
           projects (data-project/projects-for-user-eid (:id ryan))]
       (into #{} (map :name projects))))))
+
+;; Cannot delete someone else's project
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {war-eid :id} (data-project/insert-project! rhea-eid {:name "war and peace" :description "russian"})]
+     (app (request :delete (str "/project/" war-eid)))))))
+
+(expect
+ {:name "war and peace" :description "russian"}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {war-eid :id} (data-project/insert-project! rhea-eid {:name "war and peace" :description "russian"})]
+     (app (request :delete (str "/project/" war-eid)))
+     (data-project/project-by-eid war-eid)))))
+
+;; Put project changes database
+(expect
+ {:name "dauntless demographics" :description "no daunts here"}
+ (in
+  (login/as-ryan
+   (let [dauntless-response (post-new {:name "dauntless demographics" :description "my new project"})
+         dauntless (edn/read-string (:body dauntless-response))
+         dauntless-eid (:id dauntless)]
+     (-> (request :put (str "/project/" dauntless-eid))
+         (body (assoc dauntless :description "no daunts here"))
+         app)
+     (data-project/project-by-eid dauntless-eid)))))
+
+;; Put project response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [dauntless-response (post-new {:name "dauntless demographics" :description "my new project"})
+         {dauntless-eid :id :as dauntless} (edn/read-string (:body dauntless-response))]
+     (-> (request :put (str "/project/" dauntless-eid))
+         (body (assoc dauntless :description "no daunts here"))
+         app)))))
+
+;; Cannot put to someone else's project
+(expect
+ {:name "dauntless demographics" :description "no daunts here"}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {dauntless-eid :id} (data-project/insert-project! rhea-eid {:name "dauntless demographics" :description "no daunts here"})]
+     (-> (request :put (str "/project/" dauntless-eid))
+         (body {:name "malicious" :description "malicious"})
+         app)
+     (data-project/project-by-eid dauntless-eid)))))
+
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {dauntless-eid :id} (data-project/insert-project! rhea-eid {:name "dauntless demographics" :description "no daunts here"})]
+     (-> (request :put (str "/project/" dauntless-eid))
+         (body {:name "malicious" :description "malicious"})
+         app)))))

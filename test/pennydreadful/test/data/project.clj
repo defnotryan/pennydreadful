@@ -52,3 +52,30 @@
      (let [projects (projects-for-user-eid ryan-eid)]
        (into #{} (map :name projects))))))
 
+;; Update a project
+(expect
+ {:name "dauntless demographics" :description "the new description"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          {project-eid :id :as project} (insert-project! ryan-eid {:name "dauntless demographics" :description "the old description"})]
+      (update-project! (assoc project :description "the new description"))
+      (project-by-eid project-eid)))))
+
+(expect
+ {:name "new dauntless demographics" :description "the old description"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          {project-eid :id :as project} (insert-project! ryan-eid {:name "dauntless demographics" :description "the old description"})]
+      (update-project! (assoc project :name "new dauntless demographics"))
+      (project-by-eid project-eid)))))
+
+(expect
+ {:name "new dauntless demographics" :description "the new description"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          {project-eid :id :as project} (insert-project! ryan-eid {:name "dauntless demographics" :description "the old description"})]
+      (update-project! (assoc project :name "new dauntless demographics" :description "the new description"))
+      (project-by-eid project-eid)))))

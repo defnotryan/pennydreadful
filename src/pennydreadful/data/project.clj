@@ -38,6 +38,11 @@
         id (data/tempid->id result tempid)]
     (hydrate (d/entity (:db-after result) id))))
 
+(defn update-project! [project]
+  (let [project-entity (dehydrate project)
+        result @(d/transact @data/conn [project-entity])]
+    (hydrate (d/entity (:db-after result) (:id project)))))
+
 (defn project-by-eid [project-eid]
   (-> @data/conn
       (d/db)

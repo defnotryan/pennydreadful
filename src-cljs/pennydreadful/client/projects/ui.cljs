@@ -168,6 +168,7 @@
       "#project-list" (ef/prepend (project-panel project))
       "#new-project-name-input" (ef/set-prop :value "")
       (str "#project-panel-" project-eid " .project-title") (ee/listen :keydown keydown>project-title)
+      (str "#project-panel-" project-eid " .project-title") (ee/listen :input input>project-title)
       (str "#project-panel-" project-eid " .project-delete-link") (ee/listen :click #(open-confirm-modal project-eid)))
      (reset! new-project-name "")
      (.scroll js/window 0 0))))

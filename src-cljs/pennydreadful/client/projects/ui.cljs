@@ -91,6 +91,8 @@
   (let [handlers (atom {})]
     (fn [event]
       (let [project-eid (extract-id (.-target event))]
+        (ef/at
+         (str "#delete-confirmation-" project-eid " em") (ef/content (-> event .-target .-textContent)))
         (when-not (@handlers project-eid)
           (swap! handlers assoc project-eid (make-project-title-input-handler project-eid)))
         ((@handlers project-eid) event)))))
@@ -183,12 +185,15 @@
 (go
  (while true
    (let [project (<! data/updated-project-titles)
-         project-eid (-> project :id str)]
+         project-eid (-> project :id str)
+         project-name (:name project)]
      (swap! unsaved-changes disj [:project-title project-eid])
      (let [selector (str "#project-panel-" project-eid " .project-title")
-           current-title (ef/from selector (ef/get-text))]
-       (when-not (= (:name project) current-title)
-         (ef/at selector (ef/content (:name project))))))))
+           current-name (ef/from selector (ef/get-text))]
+       (when-not (= project-name current-name)
+         (ef/at selector (ef/content project-name)))
+       (ef/at
+        (str "#delete-confirmation-" project-eid " em") (ef/content project-name))))))
 
 ;; Handle project title update errors
 (go

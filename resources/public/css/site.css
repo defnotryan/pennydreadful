@@ -14,3 +14,9 @@ font-weight: bold;
 #project-nav li > div:hover > div {
 font-weight: normal;
 }
+
+.project.panel .project-description {
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  text-rendering: optimizeLegibility;
+}

@@ -30,7 +30,7 @@
   [{project-title :name project-description :description project-eid :id}]
   ".project" (ef/set-attr :id (str "project-panel-" project-eid))
   ".project-title" (ef/do-> (ef/content project-title) (ef/set-attr :data-id project-eid))
-  ".project-description" (ef/html-content project-description) ;; TODO still fussy/buggy
+  ".project-description" (ef/do-> (ef/html-content project-description) (ef/set-attr :data-id project-eid))
   ".project-write-link" (ef/set-attr :href (str "/project/" project-eid))
   ".project-delete-link" (ef/set-attr :data-reveal-id (str "delete-confirmation-" project-eid))
   ".reveal-modal" (ef/set-attr :id (str "delete-confirmation-" project-eid))

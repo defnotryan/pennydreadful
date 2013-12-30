@@ -1,5 +1,6 @@
 [
  ;; -100000 block - users
+
  {:db/id #db/id[:db.part/user -10000001]
   :user/username "ryan"
   :user/password "$2a$10$eB/DnAFx/fsLeWfH3hWh1.XVW5trRsWKxFqKqv4dbX5fvx0sqjT.6" ;; passw0rd!
@@ -10,7 +11,9 @@
   :user/password "$2a$10$SpG1xJcb6N8QIqx9G4BcGuxosgpwi3TVvv8S1OzknGXhh1P7SeyxW" ;; woof
   :user/projects [#db/id[:db.part/user -2000003] #db/id[:db.part/user -2000004]]}
 
+
  ;; -200000 block - projects
+
  {:db/id #db/id[:db.part/user -2000001]
   :project/name "accidental astronauts"
   :project/description "a story about accidental astronauts"
@@ -31,29 +34,285 @@
   :project/description "a story about dwindling dandies"
   :project/collections [#db/id[:db.part/user -3000007] #db/id[:db.part/user -3000008]]}
 
+
  ;; -3000000 block - collections
+
  {:db/id #db/id[:db.part/user -3000001]
-  :collection/name "accidental astronauts manuscript"}
+  :collection/name "accidental astronauts manuscript"
+  :collection/description "description here"
+  :collection/target 2000
+  :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/children [#db/id[:db.part/user -4000001] #db/id[:db.part/user -5000002]]}
 
  {:db/id #db/id[:db.part/user -3000002]
-  :collection/name "accidental astronauts research"}
+  :collection/name "accidental astronauts research"
+  :collection/description "description here"
+  :collection/children [#db/id[:db.part/user -4000003]]}
 
  {:db/id #db/id[:db.part/user -3000003]
-  :collection/name "bromantic birdfeeders manuscript"}
+  :collection/name "bromantic birdfeeders manuscript"
+  :collection/description "description here"
+  :collection/target 2000
+  :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/children [#db/id[:db.part/user -4000006] #db/id[:db.part/user -5000006]]}
 
  {:db/id #db/id[:db.part/user -3000004]
-  :collection/name "bromantic birdfeeders research"}
+  :collection/name "bromantic birdfeeders research"
+  :collection/description "description here"
+  :collection/children [#db/id[:db.part/user -4000008]]}
 
  {:db/id #db/id[:db.part/user -3000005]
-  :collection/name "condescending cougars manuscript"}
+  :collection/name "condescending cougars manuscript"
+  :collection/description "description here"
+  :collection/target 2000
+  :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/children [#db/id[:db.part/user -4000011] #db/id[:db.part/user -5000010]]}
 
  {:db/id #db/id[:db.part/user -3000006]
-  :collection/name "condescending cougars research"}
+  :collection/name "condescending cougars research"
+  :collection/description "description here"
+  :collection/children [#db/id[:db.part/user -4000013]]}
 
  {:db/id #db/id[:db.part/user -3000007]
-  :collection/name "dwindling dandies manuscript"}
+  :collection/name "dwindling dandies manuscript"
+  :collection/description "description here"
+  :collection/target 2000
+  :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/children [#db/id[:db.part/user -4000016] #db/id[:db.part/user -5000014]]}
 
  {:db/id #db/id[:db.part/user -3000008]
-  :collection/name "dwindling dandies research"}
+  :collection/name "dwindling dandies research"
+  :collection/description "description here"
+  :collection/children [#db/id[:db.part/user -4000018]]}
+
+
+ ;; -4000000 block - folders
+
+ {:db/id #db/id[:db.part/user -4000001]
+  :folder/name "aa folder A"
+  :folder/description "accidental astronauts folder A"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000001] #db/id[:db.part/user -4000002]]}
+
+ {:db/id #db/id[:db.part/user -4000002]
+  :folder/name "aa folder AB"
+  :folder/description "accidental astronauts folder AB"
+  :folder/target 2000}
+
+ {:db/id #db/id[:db.part/user -4000003]
+  :folder/name "aa folder B"
+  :folder/description "accidental astronauts folder B"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -4000004] #db/id[:db.part/user -4000005]]}
+
+ {:db/id #db/id[:db.part/user -4000004]
+  :folder/name "aa folder BA"
+  :folder/description "accidental astronauts folder BA"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000003] #db/id[:db.part/user -5000004]]}
+
+ {:db/id #db/id[:db.part/user -4000005]
+  :folder/name "aa folder BB"
+  :folder/description "accidental astronauts folder BB"
+  :folder/target 2000}
+
+ {:db/id #db/id[:db.part/user -4000006]
+  :folder/name "bb folder A"
+  :folder/description "bromantic birdfeeders folder A"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000005] #db/id[:db.part/user -4000007]]}
+
+ {:db/id #db/id[:db.part/user -4000007]
+  :folder/name "bb folder AB"
+  :folder/description "bromantic birdfeeders folder AB"
+  :folder/target 2000}
+
+ {:db/id #db/id[:db.part/user -4000008]
+  :folder/name "bb folder B"
+  :folder/description "bromantic birdfeeders folder B"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -4000009] #db/id[:db.part/user -4000010]]}
+
+ {:db/id #db/id[:db.part/user -4000009]
+  :folder/name "bb folder BA"
+  :folder/description "bromantic birdfeeders folder BA"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000007] #db/id[:db.part/user -5000008]]}
+
+ {:db/id #db/id[:db.part/user -4000010]
+  :folder/name "bb folder BB"
+  :folder/description "bromantic birdfeeders folder BB"
+  :folder/target 2000}
+
+ {:db/id #db/id[:db.part/user -4000011]
+  :folder/name "cc folder A"
+  :folder/description "condescending cougars folder A"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000009] #db/id[:db.part/user -4000012]]}
+
+ {:db/id #db/id[:db.part/user -4000012]
+  :folder/name "cc folder AB"
+  :folder/description "condescending cougars folder AB"
+  :folder/target 2000}
+
+ {:db/id #db/id[:db.part/user -4000013]
+  :folder/name "cc folder B"
+  :folder/description "condescending cougars folder B"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -4000014] #db/id[:db.part/user -4000015]]}
+
+ {:db/id #db/id[:db.part/user -4000014]
+  :folder/name "cc folder BA"
+  :folder/description "condescending cougars folder BA"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000011] #db/id[:db.part/user -5000012]]}
+
+ {:db/id #db/id[:db.part/user -4000015]
+  :folder/name "cc folder BB"
+  :folder/description "condescending cougars folder BB"
+  :folder/target 2000}
+
+ {:db/id #db/id[:db.part/user -4000016]
+  :folder/name "dd folder A"
+  :folder/description "dwindling dandies folder A"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000013] #db/id[:db.part/user -4000017]]}
+
+ {:db/id #db/id[:db.part/user -4000017]
+  :folder/name "dd folder AB"
+  :folder/description "dwindling dandies folder AB"
+  :folder/target 2000}
+
+ {:db/id #db/id[:db.part/user -4000018]
+  :folder/name "dd folder B"
+  :folder/description "dwindling dandies folder B"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -4000019] #db/id[:db.part/user -4000020]]}
+
+ {:db/id #db/id[:db.part/user -4000019]
+  :folder/name "dd folder BA"
+  :folder/description "dwindling dandies folder BA"
+  :folder/target 2000
+  :folder/children [#db/id[:db.part/user -5000015] #db/id[:db.part/user -5000016]]}
+
+ {:db/id #db/id[:db.part/user -4000020]
+  :folder/name "dd folder BB"
+  :folder/description "dwindling dandies folder BB"
+  :folder/target 2000}
+
+
+ ;; -5000000 block - snippets
+
+ {:db/id #db/id[:db.part/user -5000001]
+  :snippet/name "aa snippet A1"
+  :snippet/description "accidental astronauts snippet A1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000002]
+  :snippet/name "aa snippet 1"
+  :snippet/description "accidental astronauts snippet 1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000003]
+  :snippet/name "aa snippet BA1"
+  :snippet/description "accidental astronauts snippet BA1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000004]
+  :snippet/name "aa snippet BA2"
+  :snippet/description "accidental astronauts snippet BA2"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000005]
+  :snippet/name "bb snippet A1"
+  :snippet/description "bromantic birdfeeders snippet A1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000006]
+  :snippet/name "bb snippet 1"
+  :snippet/description "bromantic birdfeeders snippet 1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000007]
+  :snippet/name "bb snippet BA1"
+  :snippet/description "bromantic birdfeeders snippet BA1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000008]
+  :snippet/name "bb snippet BA2"
+  :snippet/description "bromantic birdfeeders snippet BA2"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000009]
+  :snippet/name "cc snippet A1"
+  :snippet/description "condescending cougars snippet A1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000010]
+  :snippet/name "cc snippet 1"
+  :snippet/description "condescending cougars snippet 1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000011]
+  :snippet/name "cc snippet BA1"
+  :snippet/description "condescending cougars snippet BA1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000012]
+  :snippet/name "cc snippet BA2"
+  :snippet/description "condescending cougars snippet BA2"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000013]
+  :snippet/name "dd snippet A1"
+  :snippet/description "dwindling dandies snippet A1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000014]
+  :snippet/name "dd snippet 1"
+  :snippet/description "dwindling dandies snippet 1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000015]
+  :snippet/name "dd snippet BA1"
+  :snippet/description "dwindling dandies snippet BA1"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
+
+ {:db/id #db/id[:db.part/user -5000016]
+  :snippet/name "dd snippet BA2"
+  :snippet/description "dwindling dandies snippet BA2"
+  :snippet/content "content here"
+  :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
+  :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
 
 ]

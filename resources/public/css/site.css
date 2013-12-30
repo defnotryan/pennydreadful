@@ -15,8 +15,8 @@ font-weight: bold;
 font-weight: normal;
 }
 
-.project.panel .project-description {
-  line-height: 1.6;
-  margin-bottom: 1.25rem;
-  text-rendering: optimizeLegibility;
+.textblock {
+	line-height: 1.6;
+	margin-bottom: 1.25rem;
+	text-rendering: optimizeLegibility;
 }

@@ -2,6 +2,7 @@
   (:require [expectations :refer :all]
             [pennydreadful.test.util :refer :all]
             [pennydreadful.data.user :as data-user]
+            [pennydreadful.data.collection :as data-collection]
             [pennydreadful.data.project :refer :all]))
 
 ;; Retrieve projects
@@ -79,3 +80,13 @@
           {project-eid :id :as project} (insert-project! ryan-eid {:name "dauntless demographics" :description "the old description"})]
       (update-project! (assoc project :name "new dauntless demographics" :description "the new description"))
       (project-by-eid project-eid)))))
+
+;; Get a project (shallow)
+#_(expect
+ {:name "cheddarsled" :description "a christmas tradition"}
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {project-eid :id :as project} (insert-project! ryan-eid {:name "cheddarsled" :description "a christmas tradition"})]
+     (data-collection/insert-collection! project-eid {:name "manuscript" :description "cheddarsled manuscript"})
+     (-> (project-by-eid project-eid)
+         (dissoc :id)))))

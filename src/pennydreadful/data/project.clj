@@ -1,7 +1,8 @@
 (ns pennydreadful.data.project
   (:require [datomic.api :as d]
             [pennydreadful.util :refer [denil]]
-            [pennydreadful.data.datomic :as data]))
+            [pennydreadful.data.datomic :as data]
+            [pennydreadful.data.collection :as data-collection]))
 
 (defn- dehydrate [project]
   (denil
@@ -43,11 +44,26 @@
         result @(d/transact @data/conn [project-entity])]
     (hydrate (d/entity (:db-after result) (:id project)))))
 
-(defn project-by-eid [project-eid]
+(defn- get-shallow [project-eid]
   (-> @data/conn
       (d/db)
       (d/entity project-eid)
       (hydrate)))
+
+(defn- get-with-collections [project-eid]
+  (let [project-entity (-> @data/conn (d/db) (d/entity project-eid))
+        collection-eids (map :db/id (:project/collections project-entity))
+        project (hydrate project-entity)]
+    (assoc project :collections (map data-collection/collection-by-eid collection-eids))))
+
+(defn project-by-eid
+  ([project-eid]
+   (project-by-eid project-eid {:depth :project}))
+  ([project-eid {:keys [depth] :as opts}]
+   (case depth
+     :project (get-shallow project-eid)
+     :collection (get-with-collections project-eid)
+     (get-shallow project-eid))))
 
 (defn project-eid-owned-by-user-eid? [project-eid user-eid]
   (some #{project-eid} (project-eids-for-user-eid user-eid)))

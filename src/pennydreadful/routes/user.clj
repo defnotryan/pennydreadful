@@ -7,7 +7,8 @@
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.user :as data-user]
             [pennydreadful.data.project :as data-project]
-            [pennydreadful.views.projects :as projects-view]))
+            [pennydreadful.views.projects :as projects-view]
+            [pennydreadful.views.project :as project-view]))
 
 (def resource-authenticated? (comp not-nil? friend/current-authentication :request))
 
@@ -54,12 +55,18 @@
 (defn project-delete! [project-eid ctx]
   (data-project/delete-project! project-eid))
 
+(defn project-handle-ok [project-eid {:keys [request] :as ctx}]
+  (let [authn (friend/current-authentication request)
+        project (data-project/project-by-eid project-eid {:depth :collection})]
+    (project-view/render {:project project :username (:username authn)})))
+
 (defresource project-resource [project-eid]
-  :allowed-methods [:delete :put] ; TODO :get
+  :allowed-methods [:delete :put :get]
   :available-media-types ["text/html"]
   :authorized? #(resource-mutation-allowed? project-eid %) ;; also enforces that project-eid exists
   :put! #(project-put! project-eid %)
-  :delete! #(project-delete! project-eid %))
+  :delete! #(project-delete! project-eid %)
+  :handle-ok #(project-handle-ok project-eid %))
 
 (defroutes user-routes
 

@@ -46,15 +46,15 @@
 
 (defn- get-shallow [project-eid]
   (-> @data/conn
-      (d/db)
+      d/db
       (d/entity project-eid)
-      (hydrate)))
+      hydrate))
 
-(defn- get-with-collections [project-eid]
+(defn- get-with-collections [project-eid depth]
   (let [project-entity (-> @data/conn (d/db) (d/entity project-eid))
         collection-eids (map :db/id (:project/collections project-entity))
         project (hydrate project-entity)]
-    (assoc project :collections (map data-collection/collection-by-eid collection-eids))))
+    (assoc project :collections (map #(data-collection/collection-by-eid % {:depth depth}) collection-eids))))
 
 (defn project-by-eid
   ([project-eid]
@@ -62,7 +62,8 @@
   ([project-eid {:keys [depth] :as opts}]
    (case depth
      :project (get-shallow project-eid)
-     :collection (get-with-collections project-eid)
+     :collection (get-with-collections project-eid :collection)
+     :snippet-names (get-with-collections project-eid :snippet-names)
      (get-shallow project-eid))))
 
 (defn project-eid-owned-by-user-eid? [project-eid user-eid]

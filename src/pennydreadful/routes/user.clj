@@ -57,7 +57,7 @@
 
 (defn project-handle-ok [project-eid {:keys [request] :as ctx}]
   (let [authn (friend/current-authentication request)
-        project (data-project/project-by-eid project-eid {:depth :collection})]
+        project (data-project/project-by-eid project-eid {:depth :snippet-names})]
     (project-view/render {:project project :username (:username authn)})))
 
 (defresource project-resource [project-eid]

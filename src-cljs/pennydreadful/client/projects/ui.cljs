@@ -8,6 +8,7 @@
             [pennydreadful.client.projects.data :as data]
             [pennydreadful.client.util :refer [log extract-id debounce]])
   (:require-macros [enfocus.macros :refer [defaction defsnippet]]
+                   [pennydreadful.client.util-macros :refer [go-forever]]
                    [tailrecursion.javelin :refer [defc defc= cell=]]
                    [cljs.core.async.macros :refer [go]]))
 
@@ -178,72 +179,64 @@
 ;; Handle stuff
 
 ;; Handle projects deleted
-(go
- (while true
-   (let [project-eid (<! data/deleted-project-eids)]
-     (ef/at (str "#project-panel-" project-eid) (ef/remove-node))
-     (close-confirm-modal project-eid))))
+(go-forever
+ (let [project-eid (<! data/deleted-project-eids)]
+   (ef/at (str "#project-panel-" project-eid) (ef/remove-node))
+   (close-confirm-modal project-eid)))
 
 ;; Handle project delete errors
-(go
- (while true
-   (let [response (<! data/delete-project-errors)]
-     (log response))))
+(go-forever
+ (let [response (<! data/delete-project-errors)]
+   (log response)))
 
 ;; Handle projects created
-(go
- (while true
-   (let [{project-eid :id :as project} (<! data/created-projects)]
-     (ef/at
-      "#project-list" (ef/prepend (project-panel project))
-      "#new-project-name-input" (ef/set-prop :value "")
-      (str "#project-panel-" project-eid " .project-title") (ee/listen :keydown keydown>project-title)
-      (str "#project-panel-" project-eid " .project-title") (ee/listen :input input>project-title)
-      (str "#project-panel-" project-eid " .project-delete-link") (ee/listen :click #(open-confirm-modal project-eid)))
-     (reset! new-project-name "")
-     (.scroll js/window 0 0))))
+(go-forever
+ (let [{project-eid :id :as project} (<! data/created-projects)]
+   (ef/at
+    "#project-list" (ef/prepend (project-panel project))
+    "#new-project-name-input" (ef/set-prop :value "")
+    (str "#project-panel-" project-eid " .project-title") (ee/listen :keydown keydown>project-title)
+    (str "#project-panel-" project-eid " .project-title") (ee/listen :input input>project-title)
+    (str "#project-panel-" project-eid " .project-delete-link") (ee/listen :click #(open-confirm-modal project-eid)))
+   (reset! new-project-name "")
+   (.scroll js/window 0 0)))
 
 ;; Handle project create errors
-(go
- (while true
-   (let [response (<! data/create-project-errors)]
-     (log response))))
+(go-forever
+ (let [response (<! data/create-project-errors)]
+   (log response)))
 
 ;; Handle project title updates
-(go
- (while true
-   (let [project (<! data/updated-project-titles)
-         project-eid (-> project :id str)
-         project-name (:name project)]
-     (swap! unsaved-changes disj [:project-title project-eid])
-     (let [selector (str "#project-panel-" project-eid " .project-title")
-           current-name (ef/from selector (ef/get-text))]
-       (when-not (= project-name current-name)
-         (ef/at selector (ef/content project-name)))
-       (ef/at
-        (str "#delete-confirmation-" project-eid " em") (ef/content project-name))))))
+(go-forever
+ (let [project (<! data/updated-project-titles)
+       project-eid (-> project :id str)
+       project-name (:name project)]
+   (swap! unsaved-changes disj [:project-title project-eid])
+   (let [selector (str "#project-panel-" project-eid " .project-title")
+         current-name (ef/from selector (ef/get-text))]
+     (when-not (= project-name current-name)
+       (ef/at selector (ef/content project-name)))
+     (ef/at
+      (str "#delete-confirmation-" project-eid " em") (ef/content project-name)))))
 
 ;; Handle project title update errors
-(go
- (while true
-   (let [response (<! data/update-project-title-errors)]
-     (log response))))
+(go-forever
+ (let [response (<! data/update-project-title-errors)]
+   (log response)))
 
 
 ;; Handle project description updates
-(go
- (while true
-   (let [project (<! data/updated-project-descriptions)
-         project-eid (-> project :id str)
-         project-description (:description project)]
-     (swap! unsaved-changes disj [:project-description project-eid])
-     (let [selector (str "#project-panel-" project-eid " .project-description")
-           current-description (ef/from selector (ef/get-text))]
-       (when-not (= project-description current-description)
-         (ef/at selector (ef/html-content project-description)))))))
+(go-forever
+ (let [project (<! data/updated-project-descriptions)
+       project-eid (-> project :id str)
+       project-description (:description project)]
+   (swap! unsaved-changes disj [:project-description project-eid])
+   (let [selector (str "#project-panel-" project-eid " .project-description")
+         current-description (ef/from selector (ef/get-text))]
+     (when-not (= project-description current-description)
+       (ef/at selector (ef/html-content project-description))))))
 
 ;; Handle project description update errors
-(go
- (while true
-   (let [response (<! data/update-project-description-errors)]
-     (log response))))
+(go-forever
+ (let [response (<! data/update-project-description-errors)]
+   (log response)))

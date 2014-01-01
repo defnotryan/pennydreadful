@@ -38,7 +38,11 @@
   [{collection-title :name collection-description :description collection-eid :id}]
   [:.collection] (set-attr :id (str "collection-panel-" collection-eid))
   [:.collection-title] (content collection-title)
-  [:.collection-description] (html-content collection-description))
+  [:.collection-description] (html-content collection-description)
+  [:.collection-delete-link] (set-attr :data-reveal-id (str "delete-confirmation-" collection-eid))
+  [:.reveal-modal] (set-attr :id (str "delete-confirmation-" collection-eid))
+  [:.reveal-modal :em] (content collection-title)
+  [(attr? :data-id)] (set-attr :data-id collection-eid))
 
 (deftemplate project-page template-path [{:keys [project] :as context}]
   [:head] (substitute (views.base/base-head cljs-launch-ns))

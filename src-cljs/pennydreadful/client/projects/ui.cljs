@@ -3,7 +3,7 @@
             [enfocus.events :as ee]
             [clojure.string :refer [blank? trim]]
             [tailrecursion.javelin]
-            [cljs.core.async :as async :refer [>! <! close!]]
+            [cljs.core.async :as async :refer [>! <!]]
             [pennydreadful.client.main :as main]
             [pennydreadful.client.projects.data :as data]
             [pennydreadful.client.util :refer [log extract-id debounce]])

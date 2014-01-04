@@ -1,6 +1,6 @@
 (ns pennydreadful.test.data.collection
   (:require [expectations :refer :all]
-            [pennydreadful.util :refer [mapped? pprint-str]]
+            [pennydreadful.util :refer [pprint-str]]
             [pennydreadful.test.util :refer :all]
             [pennydreadful.data.user :as data-user]
             [pennydreadful.data.project :as data-project]
@@ -42,12 +42,34 @@
                             :collections)]
         (into #{} (map :name collections))))))
 
- (defn- find-where [ms k v]
-   "Given a seq of maps ms, returns the first map where key k is mapped to value v."
-   (some #(mapped? % k v) ms))
+;; Ownership
+(expect
+ true
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (collection-eid-owned-by-user-eid? coll-eid ryan-eid))))
+
+(expect
+ false
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {rhea-eid :id} (data-user/user-for-username "rhea")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (collection-eid-owned-by-user-eid? coll-eid rhea-eid))))
 
  ;; Retrieve nested
- (expect
+(expect
   "aa snippet A1"
   (with-populated-db
     (let [{ryan-eid :id} (data-user/user-for-username "ryan")]
@@ -81,6 +103,7 @@
           (find-where :name "aa snippet BA2")
           :name))))
 
+ ;; Use this to pretty print an entire project hierarchy.
  #_(expect
   "impossible"
   (with-populated-db
@@ -91,3 +114,17 @@
           (data-project/project-by-eid {:depth :snippet-names})
           pprint-str
           print))))
+
+;; Delete collection
+(expect
+ {}
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts research"))]
+     (delete-collection! coll-eid)
+     (select-keys (collection-by-eid coll-eid) [:name :description]))))

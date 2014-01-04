@@ -6,6 +6,7 @@
             [pennydreadful.auth :as auth]
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.user :as data-user]
+            [pennydreadful.data.collection :as data-coll]
             [pennydreadful.data.project :as data-project]
             [pennydreadful.views.projects :as projects-view]
             [pennydreadful.views.project :as project-view]))
@@ -68,10 +69,31 @@
   :delete! #(project-delete! project-eid %)
   :handle-ok #(project-handle-ok project-eid %))
 
+
+(defn collection-mutation-allowed? [collection-eid {:keys [request]}]
+  (auth/user-eid-can-mutate-collection-eid?
+   (:id (friend/current-authentication request))
+   collection-eid))
+
+(defn collection-handle-ok [collection-eid {:keys [request] :as ctx}]
+  "OK")
+
+(defn collection-delete! [collection-eid ctx]
+  (data-coll/delete-collection! collection-eid))
+
+(defresource collection-resource [collection-eid]
+  :allowed-methods [:get :delete]
+  :available-media-types ["text/html"]
+  :authorized? #(collection-mutation-allowed? collection-eid %)
+  :delete! #(collection-delete! collection-eid %)
+  :handle-ok #(collection-handle-ok collection-eid %))
+
 (defroutes user-routes
 
   (GET "/" [] (projects-resource))
 
   (ANY "/project" [] (projects-resource))
 
-  (ANY "/project/:project-eid" [project-eid] (project-resource (parse-long project-eid))))
+  (ANY "/project/:project-eid" [project-eid] (project-resource (parse-long project-eid)))
+
+  (ANY "/collection/:collection-eid" [collection-eid] (collection-resource (parse-long collection-eid))))

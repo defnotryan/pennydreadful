@@ -1,6 +1,7 @@
 (ns pennydreadful.test.util
   (:require [datomic.api :as d]
-            [pennydreadful.data.datomic :as pd-datomic]))
+            [pennydreadful.data.datomic :as pd-datomic]
+            [pennydreadful.util :refer :all]))
 
 (def test-uri "datomic:mem://pennydreadful-db")
 
@@ -25,3 +26,8 @@
 (defmacro with-populated-db [& body]
   `(with-redefs [pd-datomic/conn (create-populated-in-memory-db)]
      ~@body))
+
+(defn find-where [ms k v]
+  "Given a seq of maps ms, returns the first map where key k is mapped to value,
+   or nil, if there is no such map."
+  (some #(mapped? % k v) ms))

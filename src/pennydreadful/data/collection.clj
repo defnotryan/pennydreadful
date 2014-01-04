@@ -1,6 +1,6 @@
 (ns pennydreadful.data.collection
   (:require [datomic.api :as d]
-            [pennydreadful.util :refer [denil]]
+            [pennydreadful.util :refer [denil not-nil?]]
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.folder :as data-folder]
             [pennydreadful.data.snippet :as data-snippet]))
@@ -20,6 +20,17 @@
     :description (:collection/description collection-entity)
     :target (:collection/target collection-entity)
     :deadline (:collection/deadline collection-entity)}))
+
+(def collection-eid-owned-by-user-eid-query
+  '[:find ?collection-eid
+    :in $ ?user-eid ?collection-eid
+    :where [?user-eid :user/projects ?project-eid]
+           [?project-eid :project/collections ?collection-eid]])
+
+(defn collection-eid-owned-by-user-eid? [collection-eid user-eid]
+  (let [db (d/db @data/conn)
+        results (d/q collection-eid-owned-by-user-eid-query db user-eid collection-eid)]
+    (not-nil? (ffirst results))))
 
 (defn- get-shallow [collection-eid]
   (-> @data/conn
@@ -55,3 +66,6 @@
         result @(d/transact @data/conn facts)
         id (data/tempid->id result tempid)]
     (hydrate (d/entity (:db-after result) id))))
+
+(defn delete-collection! [collection-eid]
+  @(d/transact @data/conn [[:db.fn/retractEntity collection-eid]]))

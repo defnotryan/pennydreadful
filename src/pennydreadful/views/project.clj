@@ -51,6 +51,7 @@
   [:#project-tree :ul.fa-ul] (content (map collection-node (:collections project)))
   [:#project-title] (content (:name project))
   [:#project-description] (content (:description project))
+  [:#project-eid] (set-attr :value (:id project))
   [:#collections-list] (content (map collection-panel (:collections project))))
 
 (defn render [context]

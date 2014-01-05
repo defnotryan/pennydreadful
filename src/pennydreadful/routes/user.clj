@@ -67,7 +67,8 @@
   :authorized? #(resource-mutation-allowed? project-eid %) ;; also enforces that project-eid exists
   :put! #(project-put! project-eid %)
   :delete! #(project-delete! project-eid %)
-  :handle-ok #(project-handle-ok project-eid %))
+  :handle-ok #(project-handle-ok project-eid %)
+  :handle-unauthorized (fn [ctx] friend/throw-unauthorized nil nil))
 
 
 (defn collection-mutation-allowed? [collection-eid {:keys [request]}]
@@ -86,7 +87,29 @@
   :available-media-types ["text/html"]
   :authorized? #(collection-mutation-allowed? collection-eid %)
   :delete! #(collection-delete! collection-eid %)
-  :handle-ok #(collection-handle-ok collection-eid %))
+  :handle-ok #(collection-handle-ok collection-eid %)
+  :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))
+
+(defn collections-header-location [{:keys [request] :as ctx}]
+  (when (#{:post} (:request-method request))
+    (str "/collection/" (get-in ctx [::collection :id]))))
+
+(defn collection-post! [project-eid {:keys [request] :as ctx}]
+  (let [authn (friend/current-authentication request)
+        collection (:params request)
+        inserted-collection (data-coll/insert-collection! project-eid collection)]
+    {::collection inserted-collection}))
+
+(defn collections-handle-created [ctx]
+  (pr-str (::collection ctx)))
+
+(defresource project-collection-resource [project-eid]
+  :allowed-methods [:post]
+  :available-media-types ["text/html"]
+  :authorized? #(resource-mutation-allowed? project-eid %)
+  :post! #(collection-post! project-eid %)
+  :location collections-header-location
+  :handle-created collections-handle-created)
 
 (defroutes user-routes
 
@@ -96,4 +119,6 @@
 
   (ANY "/project/:project-eid" [project-eid] (project-resource (parse-long project-eid)))
 
-  (ANY "/collection/:collection-eid" [collection-eid] (collection-resource (parse-long collection-eid))))
+  (ANY "/collection/:collection-eid" [collection-eid] (collection-resource (parse-long collection-eid)))
+
+  (POST "/project/:project-eid/collection" [project-eid] (project-collection-resource (parse-long project-eid))))

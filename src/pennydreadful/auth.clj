@@ -12,4 +12,4 @@
   (not-nil? (data-project/project-eid-owned-by-user-eid? project-eid user-eid)))
 
 (defn user-eid-can-mutate-collection-eid? [user-eid collection-eid]
-  (not-nil? (data-coll/collection-eid-owned-by-user-eid? collection-eid user-eid)))
+  (data-coll/collection-eid-owned-by-user-eid? collection-eid user-eid))

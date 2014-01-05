@@ -35,6 +35,12 @@
   ".delete-confirm" (ef/set-attr :data-id collection-eid)
   ".delete-nevermind" (ef/set-attr :data-id collection-eid))
 
+(defsnippet new-collection-node :compiled "src/pennydreadful/views/templates/project.html"
+  "#project-tree .pd-collection"
+  [{collection-name :name}]
+  ".collection-name" (ef/content collection-name)
+  "ul.fa-ul" (ef/content nil))
+
 (defaction disable-new-collection-button []
   "#create-collection-button" (ef/add-class "disabled"))
 
@@ -118,6 +124,7 @@
 (go-forever
  (let [{collection-eid :id :as collection} (<! data/created-collections)]
    (ef/at
+    "#project-tree > ul.fa-ul" (ef/append (new-collection-node collection))
     "#collections-list" (ef/prepend (collection-panel collection))
     "#new-collection-name-input" (ef/set-prop :value "")
     (str "#collection-panel-" collection-eid " .collection-delete-link") (ee/listen :click #(open-confirm-modal collection-eid)))

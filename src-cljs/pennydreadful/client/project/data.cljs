@@ -16,6 +16,10 @@
 (def created-collections (chan 1))
 (def create-collection-errors (chan 1))
 
+(def project-descriptions-to-update (chan 1))
+(def updated-project-descriptions (chan 1))
+(def update-project-description-errors (chan 1))
+
 ;; DELETE collection-eids in collection-eids-to-delete channel
 (go-forever
  (let [collection-eid (<! collection-eids-to-delete)]
@@ -43,3 +47,17 @@
           :error-handler (fn [resp]
                            (go (>! create-collection-errors resp)))
           :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT project description updates in project-descriptions-to-update
+(go-forever
+ (let [project (<! project-descriptions-to-update)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/project/" (:id project))
+        {:format :raw
+         :response-format :raw
+         :params project
+         :handler (fn [_]
+                    (go (>! updated-project-descriptions project)))
+         :error-handler (fn [resp]
+                          (go (>! update-project-description-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))

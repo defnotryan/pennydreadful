@@ -6,7 +6,7 @@
             [tailrecursion.javelin]
             [pennydreadful.client.main :as main]
             [pennydreadful.client.project.data :as data]
-            [pennydreadful.client.util :refer [log extract-id]])
+            [pennydreadful.client.util :refer [log extract-id debounce]])
   (:require-macros [enfocus.macros :refer [defaction defsnippet]]
                    [pennydreadful.client.util-macros :refer [go-forever]]
                    [tailrecursion.javelin :refer [defc defc= cell=]]
@@ -20,6 +20,10 @@
   (not (blank? new-collection-name)))
 
 (defc project-eid "")
+
+(defc unsaved-changes #{})
+
+(defc= unsaved-changes? (not (empty? unsaved-changes)))
 
 ;; DOM manipulation
 
@@ -47,6 +51,12 @@
 
 (defaction enable-new-collection-button []
   "#create-collection-button" (ef/remove-class "disabled"))
+
+(defaction show-changes-flag []
+  "#changes-flag" (ef/remove-class "hide"))
+
+(defaction hide-changes-flag []
+  "#changes-flag" (ef/add-class "hide"))
 
 (defn command-confirm-modal [command collection-eid]
   (.foundation (js/$ (str "#delete-confirmation-" collection-eid)) "reveal" command))
@@ -87,13 +97,32 @@
              {:name @new-collection-name
               :description "Type here to add a description."}]))))
 
+(defn prepare-content-string [s default-string]
+  (let [trimmed-string (trim s)]
+    (if (blank? trimmed-string)
+      default-string
+      trimmed-string)))
+
+(def input>project-description
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/project-descriptions-to-update
+           {:id @project-eid :description (prepare-content-string (-> event .-target .-innerHTML) "Type here to add a description")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:project-description @project-eid])
+     event)))
+
 (defaction setup-events []
   "body" (ee/listen-live :click ".delete-confirm" click>delete-confirm)
   "body" (ee/listen-live :click ".delete-nevermind" click>delete-nevermind)
   "#create-collection-button" (ee/listen :click click>create-collection)
   "#new-collection-name-input" (ee/listen :change change>new-collection-name)
   "#new-collection-name-input" (ee/listen :keyup keyup>new-collection-name)
-  "#new-collection-form" (ee/listen :submit submit>new-collection-form))
+  "#new-collection-form" (ee/listen :submit submit>new-collection-form)
+  "#project-description" (ee/listen :input input>project-description))
 
 ;; Initialize
 (defn ready []
@@ -101,6 +130,9 @@
   (cell= (if new-collection-name-valid?
            (enable-new-collection-button)
            (disable-new-collection-button)))
+  (cell= (if unsaved-changes?
+           (show-changes-flag)
+           (hide-changes-flag)))
   (reset! project-eid (ef/from "#project-eid" (ef/get-prop :value)))
   (setup-events))
 
@@ -137,3 +169,14 @@
 (go-forever
  (let [response (<! data/create-collection-errors)]
    (log response)))
+
+
+;; Handle project description updates
+(go-forever
+ (let [project (<! data/updated-project-descriptions)
+       project-eid (-> project :id str)
+       project-description (:description project)]
+   (swap! unsaved-changes disj [:project-description project-eid])
+   (let [current-description (ef/from "#project-description" (ef/get-text))]
+     (when-not (= project-description current-description)
+       (ef/at "#project-description" (ef/html-content project-description))))))

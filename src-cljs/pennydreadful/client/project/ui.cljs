@@ -37,8 +37,9 @@
 
 (defsnippet new-collection-node :compiled "src/pennydreadful/views/templates/project.html"
   "#project-tree .pd-collection"
-  [{collection-name :name}]
+  [{collection-name :name collection-eid :id}]
   ".collection-name" (ef/content collection-name)
+  ".pd-collection" (ef/set-attr :id (str "collection-node-" collection-eid))
   "ul.fa-ul" (ef/content nil))
 
 (defaction disable-new-collection-button []
@@ -113,6 +114,7 @@
 (go-forever
  (let [collection-eid (<! data/deleted-collection-eids)]
    (ef/at (str "#collection-panel-" collection-eid) (ef/remove-node))
+   (ef/at (str "#collection-node-" collection-eid) (ef/remove-node))
    (close-confirm-modal collection-eid)))
 
 ;; Handle collection delete errors

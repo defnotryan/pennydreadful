@@ -24,8 +24,9 @@
                 folder-children)))
 
 (defsnippet collection-node template-path [:#project-tree :.pd-collection]
-  [{collection-name :name collection-children :children}]
+  [{collection-name :name collection-children :children collection-eid :id}]
   [:.collection-name] (content collection-name)
+  [:.pd-collection] (set-attr :id (str "collection-node-" collection-eid))
   [:ul.fa-ul] (content
                (map
                 (fn [{entity-type :entity :as child}]

@@ -107,3 +107,89 @@
                           (data-project/project-by-eid {:depth :collection})
                           :collections)]
       (into #{} (map :name collections))))))
+
+;; PUT collection response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid))
+         (body {:description "new description"})
+         app)))))
+
+;; PUT collection changes database
+(expect
+ {:name "accidental astronauts manuscript" :description "new description"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid))
+         (body {:description "new description"})
+         app)
+     (data-coll/collection-by-eid coll-eid)))))
+
+;; Cannot PUT to someone else's collection
+(expect
+ {:status 403}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                            (find-where :name "condescending cougars")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "condescending cougars manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid))
+         (body {:name "malicious"})
+         app)))))
+
+(expect
+ {:name "condescending cougars manuscript" :description "description here"}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                            (find-where :name "condescending cougars")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "condescending cougars manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid))
+         (body {:name "malicious"})
+         app)
+     (data-coll/collection-by-eid coll-eid)))))
+
+;; PUT ignores :id in collection map, instead uses id in URL
+(expect
+ {:name "accidental astronauts manuscript" :description "new description"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         aa-proj (-> (data-project/projects-for-user-eid ryan-eid)
+                     (find-where :name "accidental astronauts")
+                     :id
+                     (data-project/project-by-eid {:depth :collection}))
+         {aam-coll-eid :id} (-> aa-proj
+                                :collections
+                                (find-where :name "accidental astronauts manuscript"))
+         {aar-coll-eid :id} (-> aa-proj
+                                :collections
+                                (find-where :name "accidental astronauts research"))]
+     (-> (request :put (str "/collection/" aam-coll-eid))
+         (body {:id aar-coll-eid :description "new description"})
+         app)
+     (data-coll/collection-by-eid aam-coll-eid)))))

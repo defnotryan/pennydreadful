@@ -82,10 +82,16 @@
 (defn collection-delete! [collection-eid ctx]
   (data-coll/delete-collection! collection-eid))
 
+(defn collection-put! [collection-eid ctx]
+  (let [collection (-> ctx :request :params)
+        safe-collection (assoc collection :id collection-eid)]
+    (data-coll/update-collection! safe-collection)))
+
 (defresource collection-resource [collection-eid]
-  :allowed-methods [:get :delete]
+  :allowed-methods [:get :delete :put]
   :available-media-types ["text/html"]
   :authorized? #(collection-mutation-allowed? collection-eid %)
+  :put! #(collection-put! collection-eid %)
   :delete! #(collection-delete! collection-eid %)
   :handle-ok #(collection-handle-ok collection-eid %)
   :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))

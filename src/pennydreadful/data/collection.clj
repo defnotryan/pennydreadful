@@ -69,3 +69,8 @@
 
 (defn delete-collection! [collection-eid]
   @(d/transact @data/conn [[:db.fn/retractEntity collection-eid]]))
+
+(defn update-collection! [collection]
+  (let [collection-entity (dehydrate collection)
+        result @(d/transact @data/conn [collection-entity])]
+    (hydrate (d/entity (:db-after result) (:id collection)))))

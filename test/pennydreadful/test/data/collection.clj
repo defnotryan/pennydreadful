@@ -128,3 +128,49 @@
                             (find-where :name "accidental astronauts research"))]
      (delete-collection! coll-eid)
      (select-keys (collection-by-eid coll-eid) [:name :description]))))
+
+;; Update a collection
+(expect
+ {:name "accidental astronauts manuscript" :description "the new description"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts manuscript"))]
+      (update-collection! (assoc collection :description "the new description"))
+      (collection-by-eid (:id collection))))))
+
+(expect
+ {:name "accidental astronauts new manuscript" :description "description here"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts manuscript"))]
+      (update-collection! (assoc collection :name "accidental astronauts new manuscript"))
+      (collection-by-eid (:id collection))))))
+
+(expect
+ {:name "accidental astronauts new manuscript" :description "the new description"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts manuscript"))]
+      (update-collection!
+       (assoc collection
+         :name "accidental astronauts new manuscript"
+         :description "the new description"))
+      (collection-by-eid (:id collection))))))

@@ -115,9 +115,53 @@
      (swap! unsaved-changes conj [:project-description @project-eid])
      event)))
 
+(defn make-collection-title-input-handler [collection-eid]
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/collection-titles-to-update
+           {:id collection-eid :name (prepare-content-string (-> event .-target .-textContent) "Untitled Collection")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:collection-title collection-eid])
+     event)))
+
+(def input>collection-title
+  (let [handlers (atom {})]
+    (fn [event]
+      (let [collection-eid (extract-id (.-target event))]
+        (ef/at
+         (str "#delete-confirmation-" collection-eid " em") (ef/content (-> event .-target .-textContent)))
+        (when-not (@handlers collection-eid)
+          (swap! handlers assoc collection-eid (make-collection-title-input-handler collection-eid)))
+        ((@handlers collection-eid) event)))))
+
+(defn make-collection-description-input-handler [collection-eid]
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/collection-descriptions-to-update
+           {:id collection-eid :description (prepare-content-string (-> event .-target .-innerHTML) "Type here to add a description")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:collection-description collection-eid])
+     event)))
+
+(def input>collection-description
+  (let [handlers (atom {})]
+    (fn [event]
+      (let [collection-eid (extract-id (.-target event))]
+        (when-not (@handlers collection-eid)
+          (swap! handlers assoc collection-eid (make-collection-description-input-handler collection-eid)))
+        ((@handlers collection-eid) event)))))
+
 (defaction setup-events []
   "body" (ee/listen-live :click ".delete-confirm" click>delete-confirm)
   "body" (ee/listen-live :click ".delete-nevermind" click>delete-nevermind)
+  "body" (ee/listen-live :input ".collection-title" input>collection-title)
+  "body" (ee/listen-live :input ".collection-description" input>collection-description)
   "#create-collection-button" (ee/listen :click click>create-collection)
   "#new-collection-name-input" (ee/listen :change change>new-collection-name)
   "#new-collection-name-input" (ee/listen :keyup keyup>new-collection-name)
@@ -170,7 +214,6 @@
  (let [response (<! data/create-collection-errors)]
    (log response)))
 
-
 ;; Handle project description updates
 (go-forever
  (let [project (<! data/updated-project-descriptions)
@@ -180,3 +223,43 @@
    (let [current-description (ef/from "#project-description" (ef/get-text))]
      (when-not (= project-description current-description)
        (ef/at "#project-description" (ef/html-content project-description))))))
+
+;; Handle project description update errors
+(go-forever
+ (let [response (<! data/update-project-description-errors)]
+   (log response)))
+
+;; Handle collection title updates
+(go-forever
+ (let [collection (<! data/updated-collection-titles)
+       collection-eid (-> collection :id str)
+       collection-name (:name collection)]
+   (swap! unsaved-changes disj [:collection-title collection-eid])
+   (let [selector (str "#collection-panel-" collection-eid ". collection-title")
+         current-name (ef/from selector (ef/get-text))]
+     (when-not (= collection-name current-name)
+       (ef/at selector (ef/content collection-name)))
+     (ef/at
+      (str "#delete-confirmation-" collection-eid " em") (ef/content collection-name)
+      (str "#collection-node-" collection-eid " .collection-name") (ef/content collection-name)))))
+
+;; Handle collection title update errors
+(go-forever
+ (let [response (<! data/update-collection-title-errors)]
+   (log response)))
+
+;; Handle collection description updates
+(go-forever
+ (let [collection (<! data/updated-collection-descriptions)
+       collection-eid (-> collection :id str)
+       collection-description (:description collection)]
+   (swap! unsaved-changes disj [:collection-description collection-eid])
+   (let [selector (str "#collection-panel-" collection-eid " .collection-description")
+         current-description (ef/from selector (ef/get-text))]
+     (when-not (= collection-description current-description)
+       (ef/at selector (ef/html-content collection-description))))))
+
+;; Handle collection description update errors
+(go-forever
+ (let [response (<! data/update-collection-description-errors)]
+   (log response)))

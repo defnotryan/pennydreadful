@@ -20,6 +20,14 @@
 (def updated-project-descriptions (chan 1))
 (def update-project-description-errors (chan 1))
 
+(def collection-titles-to-update (chan 3))
+(def updated-collection-titles (chan 3))
+(def update-collection-title-errors (chan 3))
+
+(def collection-descriptions-to-update (chan 3))
+(def updated-collection-descriptions (chan 3))
+(def update-collection-description-errors (chan 3))
+
 ;; DELETE collection-eids in collection-eids-to-delete channel
 (go-forever
  (let [collection-eid (<! collection-eids-to-delete)]
@@ -60,4 +68,32 @@
                     (go (>! updated-project-descriptions project)))
          :error-handler (fn [resp]
                           (go (>! update-project-description-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT collection title updates in collection-titles-to-update
+(go-forever
+ (let [collection (<! collection-titles-to-update)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/collection/" (:id collection))
+        {:format :raw
+         :response-format :raw
+         :params collection
+         :handler (fn [_]
+                    (go (>! updated-collection-titles collection)))
+         :error-handler (fn [resp]
+                          (go (>! update-collection-title-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT collection description updates in collection-descriptions-to-update
+(go-forever
+ (let [collection (<! collection-descriptions-to-update)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/collection/" (:id collection))
+        {:format :raw
+         :response-format :raw
+         :params collection
+         :handler (fn [_]
+                    (go (>! updated-collection-descriptions collection)))
+         :error-handler (fn [resp]
+                          (go (>! update-collection-description-errors resp)))
          :finally #(swap! util/outstanding-request-count dec)})))

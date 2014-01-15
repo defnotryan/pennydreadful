@@ -10,11 +10,11 @@
   (d/create-database uri)
   (let [conn (d/connect uri)]
     (doseq [schema-path schema-paths]
-      (d/transact conn (load-file schema-path)))
+      (d/transact conn (read-string (slurp schema-path))))
     (atom conn)))
 
 (def create-empty-in-memory-db
-  (partial create-db test-uri "resources/datomic/schema.edn"))
+  (partial create-db test-uri "resources/datomic/schema.edn" "resources/datomic/functions.edn"))
 
 (defmacro with-empty-db [& body]
   `(with-redefs [pd-datomic/conn (create-empty-in-memory-db)]

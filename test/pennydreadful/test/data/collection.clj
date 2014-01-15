@@ -8,7 +8,7 @@
 
 ;; Insert collection
 (expect
- {:name "manuscript" :description "cheddarsled manuscript"}
+ {:name "manuscript" :description "cheddarsled manuscript" :position 0}
  (in
   (with-populated-db
     (let [{ryan-eid :id} (data-user/user-for-username "ryan")
@@ -16,6 +16,16 @@
           {manuscript-eid :id} (insert-collection! cheddar-eid {:name "manuscript" :description "cheddarsled manuscript"})]
       (collection-by-eid manuscript-eid)))))
 
+;; Insert collection appends correctly
+(expect
+ {:name "research" :description "cheddarsled research" :position 1}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          {cheddar-eid :id} (data-project/insert-project! ryan-eid {:name "cheddarsled" :description "a christmas tradition"})
+          {manuscript-eid :id} (insert-collection! cheddar-eid {:name "manuscript" :description "cheddarsled manuscript"})
+          {research-eid :id} (insert-collection! cheddar-eid {:name "research" :description "cheddarsled research"})]
+      (collection-by-eid research-eid)))))
 
  ;; Retrieve via project
  (expect
@@ -128,6 +138,22 @@
                             (find-where :name "accidental astronauts research"))]
      (delete-collection! coll-eid)
      (select-keys (collection-by-eid coll-eid) [:name :description]))))
+
+;; Delete collection elides position correctly
+(expect
+ {:name "accidental astronauts research" :position 0}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collections (-> (data-project/projects-for-user-eid ryan-eid)
+                          (find-where :name "accidental astronauts")
+                          :id
+                          (data-project/project-by-eid {:depth :collection})
+                          :collections)
+          {manuscript-eid :id} (find-where collections :name "accidental astronauts manuscript")
+          {research-eid :id} (find-where collections :name "accidental astronauts research")]
+      (delete-collection! manuscript-eid)
+      (collection-by-eid research-eid)))))
 
 ;; Update a collection
 (expect

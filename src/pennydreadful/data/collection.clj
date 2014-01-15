@@ -19,7 +19,8 @@
     :name (:collection/name collection-entity)
     :description (:collection/description collection-entity)
     :target (:collection/target collection-entity)
-    :deadline (:collection/deadline collection-entity)}))
+    :deadline (:collection/deadline collection-entity)
+    :position (:collection/position collection-entity)}))
 
 (def collection-eid-owned-by-user-eid-query
   '[:find ?collection-eid
@@ -62,13 +63,13 @@
 (defn insert-collection! [project-eid collection]
   (let [tempid (d/tempid :db.part/user)
         collection-entity (-> collection (assoc :id tempid) (dehydrate))
-        facts [collection-entity {:db/id project-eid :project/collections tempid}]
+        facts [collection-entity [:append-collection-position project-eid tempid] {:db/id project-eid :project/collections tempid}]
         result @(d/transact @data/conn facts)
         id (data/tempid->id result tempid)]
     (hydrate (d/entity (:db-after result) id))))
 
 (defn delete-collection! [collection-eid]
-  @(d/transact @data/conn [[:db.fn/retractEntity collection-eid]]))
+  @(d/transact @data/conn [[:elide-collection-position collection-eid][:db.fn/retractEntity collection-eid]]))
 
 (defn update-collection! [collection]
   (let [collection-entity (dehydrate collection)

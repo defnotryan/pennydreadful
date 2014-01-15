@@ -73,6 +73,13 @@
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
+  :db/ident :collection/position
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db/doc "Position of the collection among other collections in its project"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
   :db/ident :collection/children
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/many
@@ -100,6 +107,12 @@
   :db/cardinality :db.cardinality/one
   :db/doc "Target word count for folder"
   :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :folder/position
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db/doc "The position of the folder among its sibling folders and snippets"}
 
  {:db/id #db/id[:db.part/db]
   :db/ident :folder/children
@@ -142,4 +155,11 @@
   :db/valueType :db.type/instant
   :db/cardinality :db.cardinality/one
   :db/doc "When snippet was last edited"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :snippet/position
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db/doc "Position of the snippet among its sibling folders and snippets"
   :db.install/_attribute :db.part/db}]

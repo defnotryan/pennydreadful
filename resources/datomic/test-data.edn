@@ -42,11 +42,13 @@
   :collection/description "description here"
   :collection/target 2000
   :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/position 0
   :collection/children [#db/id[:db.part/user -4000001] #db/id[:db.part/user -5000002]]}
 
  {:db/id #db/id[:db.part/user -3000002]
   :collection/name "accidental astronauts research"
   :collection/description "description here"
+  :collection/position 1
   :collection/children [#db/id[:db.part/user -4000003]]}
 
  {:db/id #db/id[:db.part/user -3000003]
@@ -54,11 +56,13 @@
   :collection/description "description here"
   :collection/target 2000
   :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/position 0
   :collection/children [#db/id[:db.part/user -4000006] #db/id[:db.part/user -5000006]]}
 
  {:db/id #db/id[:db.part/user -3000004]
   :collection/name "bromantic birdfeeders research"
   :collection/description "description here"
+  :collection/position 1
   :collection/children [#db/id[:db.part/user -4000008]]}
 
  {:db/id #db/id[:db.part/user -3000005]
@@ -66,11 +70,13 @@
   :collection/description "description here"
   :collection/target 2000
   :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/position 0
   :collection/children [#db/id[:db.part/user -4000011] #db/id[:db.part/user -5000010]]}
 
  {:db/id #db/id[:db.part/user -3000006]
   :collection/name "condescending cougars research"
   :collection/description "description here"
+  :collection/position 1
   :collection/children [#db/id[:db.part/user -4000013]]}
 
  {:db/id #db/id[:db.part/user -3000007]
@@ -78,11 +84,13 @@
   :collection/description "description here"
   :collection/target 2000
   :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
+  :collection/position 0
   :collection/children [#db/id[:db.part/user -4000016] #db/id[:db.part/user -5000014]]}
 
  {:db/id #db/id[:db.part/user -3000008]
   :collection/name "dwindling dandies research"
   :collection/description "description here"
+  :collection/position 1
   :collection/children [#db/id[:db.part/user -4000018]]}
 
 

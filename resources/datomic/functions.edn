@@ -1,0 +1,40 @@
+[
+
+{:db/id #db/id[:db.part/user]
+ :db/ident :append-collection-position
+ :db/fn #db/fn
+ {:lang "clojure"
+  :params [db project-eid collection-eid]
+  :code
+  [[:db/add
+    collection-eid
+    :collection/position
+    (->> project-eid
+         (datomic.api/entity db)
+         (:project/collections)
+         (map :collection/position)
+         (reduce max -1)
+         (inc))]]}}
+
+ {:db/id #db/id[:db.part/user]
+  :db/ident :elide-collection-position
+  :db/fn #db/fn
+  {:lang "clojure"
+   :params [db collection-eid]
+   :code
+   (map-indexed
+     (fn [idx collection-eid]
+       [:db/add collection-eid :collection/position idx])
+     (->> collection-eid
+          (datomic.api/q
+           '[:find ?sibling-eid
+             :in $ ?collection-eid
+             :where [?project-eid :project/collections ?collection-eid]
+                    [?project-eid :project/collections ?sibling-eid]]
+           db)
+          (map first)
+          (map (partial datomic.api/entity db))
+          (sort-by :collection/position)
+          (map :db/id)
+          (filter (partial not= collection-eid))))}}
+ ]

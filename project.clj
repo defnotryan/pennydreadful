@@ -32,6 +32,7 @@
          :init    pennydreadful.handler/init
          :destroy pennydreadful.handler/destroy}
   :datomic {:schemas ["resources/datomic" ["schema.edn"
+                                           "functions.edn"
                                            "test-data.edn"]]}
   :profiles
   {:production {:ring {:open-browser? false

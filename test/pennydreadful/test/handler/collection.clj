@@ -193,3 +193,107 @@
          (body {:id aar-coll-eid :description "new description"})
          app)
      (data-coll/collection-by-eid aam-coll-eid)))))
+
+;; PUT /collection/:collection-eid/move-up response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts research"))]
+     (-> (request :put (str "/collection/" coll-eid "/move-up"))
+         app)))))
+
+;; PUT /collection/:collection-eid/move-down response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid "/move-down"))
+         app)))))
+
+;; Can't move-up someone else's collection
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {rhea-eid :id} (data-user/user-for-username "rhea")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                            (find-where :name "condescending cougars")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "condescending cougars research"))]
+     (-> (request :put (str "/collection/" coll-eid "/move-up"))
+         app)))))
+
+;; Can't move-down someone else's collection
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {rhea-eid :id} (data-user/user-for-username "rhea")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                            (find-where :name "condescending cougars")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "condescending cougars manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid "/move-down"))
+         app)))))
+
+;; PUT to /collection/:collection-eid/move-up mutates database correctly
+(expect
+ {:name "accidental astronauts research"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts research"))]
+     (-> (request :put (str "/collection/" coll-eid "/move-up"))
+         app)
+     (-> (data-project/projects-for-user-eid ryan-eid)
+         (find-where :name "accidental astronauts")
+         :id
+         (data-project/project-by-eid {:depth :collection})
+         :collections
+         (find-where :position 0))))))
+
+;; PUT to /collection/:collection-eid/move-down mutates database correctly
+(expect
+ {:name "accidental astronauts research"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid "/move-down"))
+         app)
+     (-> (data-project/projects-for-user-eid ryan-eid)
+         (find-where :name "accidental astronauts")
+         :id
+         (data-project/project-by-eid {:depth :collection})
+         :collections
+         (find-where :position 0))))))

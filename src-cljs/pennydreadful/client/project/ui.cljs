@@ -6,7 +6,7 @@
             [tailrecursion.javelin]
             [pennydreadful.client.main :as main]
             [pennydreadful.client.project.data :as data]
-            [pennydreadful.client.util :refer [log extract-id debounce]])
+            [pennydreadful.client.util :refer [log extract-id debounce move-node-up move-node-down]])
   (:require-macros [enfocus.macros :refer [defaction defsnippet]]
                    [pennydreadful.client.util-macros :refer [go-forever]]
                    [tailrecursion.javelin :refer [defc defc= cell=]]
@@ -34,6 +34,8 @@
   ".collection-title" (ef/do-> (ef/content collection-title) (ef/set-attr :data-id collection-eid))
   ".collection-description" (ef/do-> (ef/content collection-description) (ef/set-attr :data-id collection-eid))
   ".collection-delete-link" (ef/set-attr :data-reveal-id (str "delete-confirmation-" collection-eid))
+  ".collection-move-up" (ef/set-attr :data-id collection-eid)
+  ".collection-move-down" (ef/set-attr :data-id collection-eid)
   ".reveal-modal" (ef/set-attr :id (str "delete-confirmation-" collection-eid))
   ".reveal-modal em" (ef/content collection-title)
   ".delete-confirm" (ef/set-attr :data-id collection-eid)
@@ -51,6 +53,12 @@
 
 (defaction enable-new-collection-button []
   "#create-collection-button" (ef/remove-class "disabled"))
+
+(defaction reset-move-buttons []
+  ".collection-move-up" (ef/remove-class "disabled")
+  ".collection-move-down" (ef/remove-class "disabled")
+  "#collections-list > .collection:first-child .collection-move-up" (ef/add-class "disabled")
+  "#collections-list > .collection:last-child .collection-move-down" (ef/add-class "disabled"))
 
 (defaction show-changes-flag []
   "#changes-flag" (ef/remove-class "hide"))
@@ -157,11 +165,23 @@
           (swap! handlers assoc collection-eid (make-collection-description-input-handler collection-eid)))
         ((@handlers collection-eid) event)))))
 
+(defn click>collection-move-up [event]
+  (go
+   (let [collection-eid (extract-id (.-target event))]
+     (>! data/collection-eids-to-move-up collection-eid))))
+
+(defn click>collection-move-down [event]
+  (go
+   (let [collection-eid (extract-id (.-target event))]
+     (>! data/collection-eids-to-move-down collection-eid))))
+
 (defaction setup-events []
   "body" (ee/listen-live :click ".delete-confirm" click>delete-confirm)
   "body" (ee/listen-live :click ".delete-nevermind" click>delete-nevermind)
   "body" (ee/listen-live :input ".collection-title" input>collection-title)
   "body" (ee/listen-live :input ".collection-description" input>collection-description)
+  "body" (ee/listen-live :click ".collection-move-up:not(.disabled)" click>collection-move-up)
+  "body" (ee/listen-live :click ".collection-move-down:not(.disabled)" click>collection-move-down)
   "#create-collection-button" (ee/listen :click click>create-collection)
   "#new-collection-name-input" (ee/listen :change change>new-collection-name)
   "#new-collection-name-input" (ee/listen :keyup keyup>new-collection-name)
@@ -178,7 +198,8 @@
            (show-changes-flag)
            (hide-changes-flag)))
   (reset! project-eid (ef/from "#project-eid" (ef/get-prop :value)))
-  (setup-events))
+  (setup-events)
+  (reset-move-buttons))
 
 (defn init []
   (main/ready ready)
@@ -203,11 +224,11 @@
  (let [{collection-eid :id :as collection} (<! data/created-collections)]
    (ef/at
     "#project-tree > ul.fa-ul" (ef/append (new-collection-node collection))
-    "#collections-list" (ef/prepend (collection-panel collection))
+    "#collections-list" (ef/append (collection-panel collection))
     "#new-collection-name-input" (ef/set-prop :value "")
     (str "#collection-panel-" collection-eid " .collection-delete-link") (ee/listen :click #(open-confirm-modal collection-eid)))
    (reset! new-collection-name "")
-   (.scroll js/window 0 0)))
+   (reset-move-buttons)))
 
 ;; Handle collection create errors
 (go-forever
@@ -262,4 +283,32 @@
 ;; Handle collection description update errors
 (go-forever
  (let [response (<! data/update-collection-description-errors)]
+   (log response)))
+
+;; Handle collections moved up
+(go-forever
+ (let [collection-eid (<! data/moved-up-collection-eids)
+       panel-sel (str "#collection-panel-" collection-eid)
+       tree-sel (str "#collection-node-" collection-eid)]
+   (move-node-up panel-sel)
+   (move-node-up tree-sel)
+   (reset-move-buttons)))
+
+;; Handle collection move up errors
+(go-forever
+ (let [response (<! data/move-up-collection-eid-errors)]
+   (log response)))
+
+;; Handle collections moved down
+(go-forever
+ (let [collection-eid (<! data/moved-down-collection-eids)
+       panel-sel (str "#collection-panel-" collection-eid)
+       tree-sel (str "#collection-node-" collection-eid)]
+   (move-node-down panel-sel)
+   (move-node-down tree-sel)
+   (reset-move-buttons)))
+
+;; Handle collection move down errors
+(go-forever
+ (let [response (<! data/move-down-collection-eid-errors)]
    (log response)))

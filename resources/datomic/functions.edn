@@ -36,5 +36,73 @@
           (map (partial datomic.api/entity db))
           (sort-by :collection/position)
           (map :db/id)
-          (filter (partial not= collection-eid))))}}
+          (remove #{collection-eid})))}}
+
+ {:db/id #db/id[:db.part/user]
+  :db/ident :move-up-collection-position
+  :db/fn #db/fn
+  {:lang "clojure"
+   :params [db collection-eid]
+   :code
+   (map-indexed
+    (fn [idx collection-eid]
+      [:db/add collection-eid :collection/position idx])
+    (let [collection-eids
+          (->> collection-eid
+               (datomic.api/q
+                '[:find ?sibling-eid
+                  :in $ ?collection-eid
+                  :where [?project-eid :project/collections ?collection-eid]
+                         [?project-eid :project/collections ?sibling-eid]]
+                db)
+               (map first)
+               (map (partial datomic.api/entity db))
+               (sort-by :collection/position)
+               (map :db/id))]
+      (if (= collection-eid (first collection-eids))
+        collection-eids
+        (let [vz (clojure.zip/vector-zip (vec collection-eids))]
+          (loop [n (clojure.zip/down vz)]
+
+            (if (= collection-eid (clojure.zip/node n))
+              (-> n
+                  clojure.zip/remove
+                  (clojure.zip/insert-left collection-eid)
+                  clojure.zip/root)
+              (recur (clojure.zip/next n))))))))}}
+
+ {:db/id #db/id[:db.part/user]
+  :db/ident :move-down-collection-position
+  :db/fn #db/fn
+  {:lang "clojure"
+   :requires [clojure.zip]
+   :params [db collection-eid]
+   :code
+   (map-indexed
+    (fn [idx collection-eid]
+      [:db/add collection-eid :collection/position idx])
+    (let [collection-eids
+          (->> collection-eid
+               (datomic.api/q
+                '[:find ?sibling-eid
+                  :in $ ?collection-eid
+                  :where [?project-eid :project/collections ?collection-eid]
+                         [?project-eid :project/collections ?sibling-eid]]
+                db)
+               (map first)
+               (map (partial datomic.api/entity db))
+               (sort-by :collection/position)
+               (map :db/id))]
+      (if (= collection-eid (last collection-eids))
+        collection-eids
+        (let [vz (clojure.zip/vector-zip (vec collection-eids))]
+          (loop [n (clojure.zip/down vz)]
+            (if (= collection-eid (clojure.zip/node n))
+              (-> n
+                  clojure.zip/remove
+                  clojure.zip/next
+                  (clojure.zip/insert-right collection-eid)
+                  clojure.zip/root)
+              (recur (clojure.zip/next n))))))))}}
+
  ]

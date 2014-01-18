@@ -1,0 +1,299 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Penny Dreadful</title>
+    <link rel="stylesheet" href="../../../../resources/public/css/foundation.css"/>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../../../resources/public/css/site.css"/>
+    <script src="../../../../resources/public/js/modernizr.js"></script>
+    <script type="text/javascript" src="../../../../resources/public/js/jquery.js"></script>
+    <script type="text/javascript" src="../../../../resources/public/js/spin.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $(document).foundation();
+
+        var spinner = new Spinner({
+          lines: 9,
+          length: 6,
+          width: 1,
+          radius: 3,
+          corners: 0,
+          rotate: 0,
+          direction: 1,
+          color: "#fff",
+          speed: 1,
+          trail: 60,
+          shadow: false,
+          top: "12px"}).spin(document.getElementById("spinner")); 
+      });
+    </script>
+  </head>
+  <body>
+    <div class="fixed">
+      <nav class="top-bar" data-topbar>
+        <ul class="title-area">
+          <li class="name">
+            <h1>
+              <a href="#">
+                <i class="fa fa-book"></i>
+                Penny Dreadful <small id="pd-version">v0.8.0</small>
+              </a>
+            </h1>
+          </li>
+          <li class="toggle-topbar menu-icon">
+            <a href="#"><span>Menu</span></a>
+          </li>
+        </ul>
+        <section class="top-bar-section">
+          <ul class="left">
+            <li class="name">
+              <span id="spinner" class="hide"></span>
+            </li>
+          </ul>
+          <ul class="right">
+            <li>
+              <a href="#"><i class="fa fa-tasks"></i> All Projects</a>
+            </li>
+            <li class="has-dropdown">
+              <a href="#"><i class="fa fa-user"></i> Logged in as ryan</a>
+              <ul class="dropdown">
+                <li><a href="#"><i class="fa fa-cog"></i> Account Settings</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#"><i class="fa fa-power-off"></i> Log Out</a>
+            </li>
+          </ul>
+        </section>
+      </nav>
+    </div>
+
+    <div id="project-nav" class="large-3 medium-3 small-3 columns">
+      <h3 id="project-title">Project 1</h3>
+
+      <div id="project-tree">
+
+      <ul class="fa-ul">
+
+        <!-- for each collection -->
+        <li class="pd-collection" id="collection-node-1111">
+          <div><i class="fa-li fa fa-briefcase"></i><span class="collection-name"><a href="#">Collection 1</a></span></div>
+          <ul class="fa-ul">
+
+            <!-- for each child in collection -->
+            <li class="pd-folder">
+              <div><i class="fa-li fa fa-folder-open"></i><span class="folder-name"><a href="#">Folder 1</a></span></div>
+              <ul class="fa-ul">
+
+                <!-- for each child in folder -->
+                <li class="pd-snippet">
+                  <div><i class="fa-li fa fa-file-text-o"></i><span class="snippet-name"><a href="#">Snippet 1</a></span></div>
+                </li>
+
+                <li>
+                  <div><i class="fa-li fa fa-folder"></i><span class="folder-name"><a href="#">Folder 1a</a></span></div>
+                </li>
+                <!-- end for each child in folder -->
+
+              </ul>
+            </li>
+            <!-- end for each child in collection -->
+
+          </ul>          
+        </li>
+        <!-- end for each collection -->
+      </ul>
+      </div>
+
+    </div>
+
+    <div class="large-6 medium-6 small-6 columns">
+      <div class="row">
+        <div class="large-11 columns"><h2 id="collection-title">Collection Title</h2></div>
+        <div class="large-1 columns text-right">
+          <h2 id="changes-flag" class="hide">
+            <small>
+              <span data-tooltip class="has-tip" title="Your changes will be saved soon. Do not navigate away until this icon disappears.">
+                <i class="fa fa-bolt"></i>
+              </span>
+            </small>
+          </h2>
+        </div>
+      </div>
+
+      <div id="children-list">
+        <div class="folder child panel" id="child-panel-1111">
+          <h3><span class="child-title" data-id="1111" contenteditable="true">Folder Title</span></h3>
+          <div class="child-description textblock" contenteditable="true" data-id="1111">Folder description</div>
+          <div class="row">
+            <div class="large-12 columns clearfix">
+              <ul class="button-group right">
+                <li><a class="small button child-move-up" data-id="1111"><i class="fa fa-arrow-up"></i> Move up</a></li>
+                <li><a class="small button child-move-down" data-id="1111"><i class="fa fa-arrow-down"></i> Move down</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="snippet child panel" id="child-panel-2222">
+          <h3><span class="child-title" data-id="2222" contenteditable="true">Snippet Title</span></h3>
+          <div class="child-description textblock" contenteditable="true" data-id="2222">Snippet description</div>
+          <div class="row">
+            <div class="large-12 columns clearfix">
+              <ul class="button-group right">
+                <li><a class="small button child-move-up" data-id="2222"><i class="fa fa-arrow-up"></i> Move up</a></li>
+                <li><a class="small button child-move-down" data-id="2222"><i class="fa fa-arrow-down"></i> Move down</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <form id="new-folder-form">
+        <input type="hidden" id="collection-eid" value="9999"/>
+        <div class="row collapse">
+          <div class="large-9 columns">
+            <input id="new-folder-name-input" type="text" placeholder="Enter a new folder name"/>
+          </div>
+          <div class="large-3 columns">
+            <a id="create-folder-button" class="postfix button"><i class="fa fa-plus"></i> Create Folder</a>
+          </div>
+        </div>
+      </form>
+
+      <form id="new-snippet-form">
+        <input type="hidden" id="collection-eid" value="9999"/>
+        <div class="row collapse">
+          <div class="large-9 columns">
+            <input id="new-snippet-name-input" type="text" placeholder="Enter a new snippet name"/>
+          </div>
+          <div class="large-3 columns">
+            <a id="create-snippet-button" class="postfix button"><i class="fa fa-plus"></i> Create Snippet</a>
+          </div>
+        </div>
+      </form>
+
+    </div>
+
+    <div class="large-3 medium-3 small-3 columns">
+      <h3>This Collection</h3>
+
+      <div class="panel">
+        <h4>Progress</h4>
+        <p><span id="current-wc">1264</span> of <span id="target-wc">2000</span> words</p>
+        <div class="progress" style="margin-top:0.8em">
+          <span class="meter" style="width:60%"></span>
+        </div>
+        <a id="edit-progress-button" data-reveal-id="edit-progress-dialog" class="tiny button"><i class="fa fa-pencil"></i> Edit</a>
+        <div id="edit-progress-dialog" class="reveal-modal small" data-reveal>
+          <h2>Progress Settings</h2>
+          <p>You can set the target word count to automatic to have it reflect the total of all targets for folders and snippets this collection contains. You can also set it manually, or just turn it off.</p>
+          <div class="row">
+            <div class="large-1 columns"><input type="radio" name="target-mode" id="target-off" checked="checked"></div>
+            <div class="large-11 columns"><label for="target-off">Turn target word count off</label></div>
+          </div>
+          <div class="row">
+            <div class="large-1 columns"><input type="radio" name="target-mode" id="target-auto"></div>
+            <div class="large-11 columns"><label for="target-auto">Automatically calculate target word count</label></div>
+          </div>
+          <div class="row">
+            <div class="large-1 columns"><input type="radio" name="target-mode" id="target-manual"></div>
+            <div class="large-11 columns"><label for="target-manual">Manually set target to:</label></div>
+          </div>
+          <div class="row">
+            <div class="large-11 large-offset-1 columns"><input type="text" id="target-manual-value" placeholder="target word count"/></div>
+          </div>
+          <div class="row">
+            <div class="large-12 columns clearfix">
+              <ul class="button-group right">
+                <li><a class="button cancel-progress-dialog"><i class="fa fa-times"></i> Cancel</a></li>
+                <li><a class="success button submit-progress-dialog"><i class="fa fa-check"></i> Apply</a></li>
+              </ul>
+            </div>
+          </div>
+          <a class="close-reveal-modal">&#215;</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4>Deadline</h4>
+        <p>Due <span data-tooltip class="has-tip" title="20 April 2014 at 5:00pm">in 90 days</span>!</p>
+        <a id="edit-deadline-button" data-reveal-id="edit-deadline-dialog" class="tiny button"><i class="fa fa-pencil"></i> Edit</a>
+        <div id="edit-deadline-dialog" class="reveal-modal small" data-reveal>
+          <h2>Deadline Settings</h2>
+          <p>You can set the deadline to automatic and it will reflect the latest deadline among all the folders and snippets this collection contains. You can also set it manually, or just turn it off.</p>
+          <div class="row">
+            <div class="large-1 columns"><input type="radio" name="deadline-mode" id="deadline-off"></div>
+            <div class="large-11 columns"><label for="deadline-off">Turn deadline off</label></div>
+          </div>
+          <div class="row">
+            <div class="large-1 columns"><input type="radio" name="deadline-mode" id="deadline-auto"></div>
+            <div class="large-11 columns"><label for="deadline-auto">Automatically set the deadline</label></div>
+          </div>
+          <div class="row">
+            <div class="large-1 columns"><input type="radio" name="deadline-mode" id="deadline-manual"></div>
+            <div class="large-11 columns"><label for="deadline-manual">Manually set deadline to:</label></div>
+          </div>
+          <div class="row">
+            <div class="large-1 columns"></div>
+            <div class="large-2 columns">
+              <select id="deadline-day" placeholder="Day">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </div>
+            <div class="large-7 columns">
+              <select id="deadline-month">
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+              </select>
+            </div>
+            <div class="large-2 columns">
+              <select id="deadline-year">
+                <option value="2014">2014</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+                <option value="2017">2017</option>
+                <option value="2018">2018</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="large-12 columns clearfix">
+              <ul class="button-group right">
+                <li><a class="button cancel-deadline-dialog"><i class="fa fa-times"></i> Cancel</a></li>
+                <li><a class="success button submit-deadline-dialog"><i class="fa fa-check"></i> Apply</a></li>
+              </ul>
+            </div>
+          </div>
+          <a class="close-reveal-modal">&#215;</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4>Description</h4>
+        <div class="textblock" id="collection-description" contenteditable="true">
+          Schlitz bicycle rights Williamsburg tousled meh American Apparel, typewriter dreamcatcher Wes Anderson. Wolf whatever put a bird on it plaid McSweeney's stumptown. 
+        </div>
+      </div>
+    </div>
+
+    <section class="deps">
+      <script src="../../../../resources/public/js/foundation.min.js"></script>
+    </section>    
+  </body>
+</html>

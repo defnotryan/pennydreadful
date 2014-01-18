@@ -20,3 +20,8 @@ font-weight: normal;
 	margin-bottom: 1.25rem;
 	text-rendering: optimizeLegibility;
 }
+
+#project-tree a {
+	color: #222;
+	text-decoration: none;
+}

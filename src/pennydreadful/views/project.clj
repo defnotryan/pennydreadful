@@ -9,12 +9,14 @@
 
 ;; Nav tree snippets
 (defsnippet snippet-node template-path [:#project-tree :.pd-snippet]
-  [{snippet-name :name}]
-  [:.snippet-name] (content snippet-name))
+  [{snippet-name :name snippet-eid :id}]
+  [:.snippet-name :a] (do-> (content snippet-name)
+                            (set-attr :href (str "/snippet/" snippet-eid))))
 
 (defsnippet folder-node template-path [:#project-tree :.pd-folder]
-  [{folder-name :name folder-children :children}]
-  [:.folder-name] (content folder-name)
+  [{folder-name :name folder-children :children folder-eid :id}]
+  [:.folder-name :a] (do-> (content folder-name)
+                           (set-attr :href (str "/folder/" folder-eid)))
   [:ul.fa-ul] (content
                (map
                 (fn [{entity-type :entity :as child}]
@@ -25,7 +27,8 @@
 
 (defsnippet collection-node template-path [:#project-tree :.pd-collection]
   [{collection-name :name collection-children :children collection-eid :id}]
-  [:.collection-name] (content collection-name)
+  [:.collection-name :a] (do-> (content collection-name)
+                               (set-attr :href (str "/collection/" collection-eid)))
   [:.pd-collection] (set-attr :id (str "collection-node-" collection-eid))
   [:ul.fa-ul] (content
                (map
@@ -49,11 +52,11 @@
   [:head] (substitute (views.base/base-head cljs-launch-ns))
   [:nav] (substitute (views.base/base-nav (:username context)))
   [:section.deps] (substitute (views.base/base-deps))
-  [:#project-tree :ul.fa-ul] (content (map collection-node (:collections project)))
+  [:#project-tree :ul.fa-ul] (content (map collection-node (sort-by :position (:collections project))))
   [:#project-title] (content (:name project))
   [:#project-description] (content (:description project))
   [:#project-eid] (set-attr :value (:id project))
-  [:#collections-list] (content (map collection-panel (:collections project))))
+  [:#collections-list] (content (map collection-panel (sort-by :position (:collections project)))))
 
 (defn render [context]
   (apply str (project-page context)))

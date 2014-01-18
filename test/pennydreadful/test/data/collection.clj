@@ -200,3 +200,44 @@
          :name "accidental astronauts new manuscript"
          :description "the new description"))
       (collection-by-eid (:id collection))))))
+
+;; Move collection up
+
+(expect
+ ["accidental astronauts research" "accidental astronauts manuscript"]
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         project (-> (data-project/projects-for-user-eid ryan-eid)
+                     (find-where :name "accidental astronauts")
+                     :id
+                     (data-project/project-by-eid {:depth :collection}))
+         research (find-where (:collections project) :name "accidental astronauts research")]
+     (move-up! (:id research))
+     (let [collections (-> (data-project/projects-for-user-eid ryan-eid)
+                           (find-where :name "accidental astronauts")
+                           :id
+                           (data-project/project-by-eid {:depth :collection})
+                           :collections)]
+       (->> collections
+            (sort-by :position)
+            (map :name))))))
+
+;; Move collection down
+(expect
+ ["accidental astronauts research" "accidental astronauts manuscript"]
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         project (-> (data-project/projects-for-user-eid ryan-eid)
+                     (find-where :name "accidental astronauts")
+                     :id
+                     (data-project/project-by-eid {:depth :collection}))
+         manuscript (find-where (:collections project) :name "accidental astronauts manuscript")]
+     (move-down! (:id manuscript))
+     (let [collections (-> (data-project/projects-for-user-eid ryan-eid)
+                           (find-where :name "accidental astronauts")
+                           :id
+                           (data-project/project-by-eid {:depth :collection})
+                           :collections)]
+       (->> collections
+            (sort-by :position)
+            (map :name))))))

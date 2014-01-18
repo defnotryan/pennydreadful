@@ -75,3 +75,9 @@
   (let [collection-entity (dehydrate collection)
         result @(d/transact @data/conn [collection-entity])]
     (hydrate (d/entity (:db-after result) (:id collection)))))
+
+(defn move-up! [collection-eid]
+  @(d/transact @data/conn [[:move-up-collection-position collection-eid]]))
+
+(defn move-down! [collection-eid]
+  @(d/transact @data/conn [[:move-down-collection-position collection-eid]]))

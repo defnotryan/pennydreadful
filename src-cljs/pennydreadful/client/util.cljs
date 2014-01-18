@@ -32,6 +32,15 @@
   ([f wait immediate]
    (.debounce js/_ f wait immediate)))
 
+(defn move-node-up [selector]
+  "Move the node specified by the selector up among its siblings"
+  (let [$node (js/$ selector)]
+    (.insertBefore $node (.prev $node))))
+
+(defn move-node-down [selector]
+  "Move the node specified by the selecto down among its siblings"
+  (let [$node (js/$ selector)]
+    (.insertAfter $node (.next $node))))
 
 ;; Ajax stuff
 

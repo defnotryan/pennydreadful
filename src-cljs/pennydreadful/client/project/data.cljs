@@ -28,6 +28,14 @@
 (def updated-collection-descriptions (chan 3))
 (def update-collection-description-errors (chan 3))
 
+(def collection-eids-to-move-up (chan 1))
+(def moved-up-collection-eids (chan 1))
+(def move-up-collection-eid-errors (chan 1))
+
+(def collection-eids-to-move-down (chan 1))
+(def moved-down-collection-eids (chan 1))
+(def move-down-collection-eid-errors (chan 1))
+
 ;; DELETE collection-eids in collection-eids-to-delete channel
 (go-forever
  (let [collection-eid (<! collection-eids-to-delete)]
@@ -96,4 +104,30 @@
                     (go (>! updated-collection-descriptions collection)))
          :error-handler (fn [resp]
                           (go (>! update-collection-description-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT collection-eids for moving up
+(go-forever
+ (let [collection-eid (<! collection-eids-to-move-up)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/collection/" collection-eid "/move-up")
+        {:format :raw
+         :response-format :raw
+         :handler (fn [_]
+                    (go (>! moved-up-collection-eids collection-eid)))
+         :error-handler (fn [resp]
+                          (go (>! move-up-collection-eid-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT collection-eids for moving down
+(go-forever
+ (let [collection-eid (<! collection-eids-to-move-down)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/collection/" collection-eid "/move-down")
+        {:format :raw
+         :response-format :raw
+         :handler (fn [_]
+                    (go (>! moved-down-collection-eids collection-eid)))
+         :error-handler (fn [resp]
+                          (go (>! move-down-collection-eid-errors resp)))
          :finally #(swap! util/outstanding-request-count dec)})))

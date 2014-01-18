@@ -117,6 +117,28 @@
   :location collections-header-location
   :handle-created collections-handle-created)
 
+(defn collection-move-up! [collection-eid _]
+  (data-coll/move-up! collection-eid)
+  {::collection (data-coll/collection-by-eid collection-eid)})
+
+(defresource collection-move-up [collection-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? #(collection-mutation-allowed? collection-eid %)
+  :put! #(collection-move-up! collection-eid %)
+  :handle-created collections-handle-created)
+
+(defn collection-move-down! [collection-eid _]
+  (data-coll/move-down! collection-eid)
+  {::collection (data-coll/collection-by-eid collection-eid)})
+
+(defresource collection-move-down [collection-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? #(collection-mutation-allowed? collection-eid %)
+  :put! #(collection-move-down! collection-eid %)
+  :handle-created collections-handle-created)
+
 (defroutes user-routes
 
   (GET "/" [] (projects-resource))
@@ -126,5 +148,9 @@
   (ANY "/project/:project-eid" [project-eid] (project-resource (parse-long project-eid)))
 
   (ANY "/collection/:collection-eid" [collection-eid] (collection-resource (parse-long collection-eid)))
+
+  (PUT "/collection/:collection-eid/move-up" [collection-eid] (collection-move-up (parse-long collection-eid)))
+
+  (PUT "/collection/:collection-eid/move-down" [collection-eid] (collection-move-down (parse-long collection-eid)))
 
   (POST "/project/:project-eid/collection" [project-eid] (project-collection-resource (parse-long project-eid))))

@@ -1,6 +1,6 @@
 (ns pennydreadful.util
   (:use clojure.pprint)
-  (:require [markdown.core :as md]))
+  (:require [clj-time.format :as tf]))
 
 (def version (-> "project.clj" slurp read-string (nth 2)))
 
@@ -24,3 +24,11 @@
 
 (defn parse-long [s]
   (Long/parseLong s))
+
+(defn parse-int [s]
+  (Integer/parseInt s))
+
+(def inst-formatter (tf/formatter "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"))
+
+(defn parse-inst [s]
+  (tf/parse inst-formatter s))

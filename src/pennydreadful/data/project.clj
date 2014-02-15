@@ -64,6 +64,7 @@
      :project (get-shallow project-eid)
      :collection (get-with-collections project-eid :collection)
      :snippet-names (get-with-collections project-eid :snippet-names)
+     :snippet (get-with-collections project-eid :snippet)
      (get-shallow project-eid))))
 
 (defn project-eid-owned-by-user-eid? [project-eid user-eid]

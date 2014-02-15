@@ -1,5 +1,6 @@
 (ns pennydreadful.test.data.collection
   (:require [expectations :refer :all]
+            [clj-time.coerce :as tc]
             [pennydreadful.util :refer [pprint-str]]
             [pennydreadful.test.util :refer :all]
             [pennydreadful.data.user :as data-user]
@@ -8,12 +9,12 @@
 
 ;; Insert collection
 (expect
- {:name "manuscript" :description "cheddarsled manuscript" :position 0}
+ {:name "manuscript" :description "cheddarsled manuscript" :position 0 :word-count-mode :manual :target 50000 :deadline-mode :manual :deadline (tc/from-date #inst "2014-11-30T00:00:00.000-00:00")}
  (in
   (with-populated-db
     (let [{ryan-eid :id} (data-user/user-for-username "ryan")
           {cheddar-eid :id} (data-project/insert-project! ryan-eid {:name "cheddarsled" :description "a christmas tradition"})
-          {manuscript-eid :id} (insert-collection! cheddar-eid {:name "manuscript" :description "cheddarsled manuscript"})]
+          {manuscript-eid :id} (insert-collection! cheddar-eid {:name "manuscript" :description "cheddarsled manuscript" :word-count-mode :manual :target 50000 :deadline-mode :manual :deadline #inst "2014-11-30T00:00:00.000-00:00"})]
       (collection-by-eid manuscript-eid)))))
 
 ;; Insert collection appends correctly
@@ -28,6 +29,14 @@
       (collection-by-eid research-eid)))))
 
  ;; Retrieve via project
+ ;; N.B. when using (data-project/project-by-eid {:depth :collection}),
+ ;; remember that :collections is a lazy seq that depends on the database
+ ;; to be realized. So if you pass (and use) that seq outside of the
+ ;; with-populated-db macro (which has an implicit with-redefs on the
+ ;; database connection), realizing that lazy seq will fail or have
+ ;; unexpected results. I.e., if Expect is going to print the project map,
+ ;; make it safe with (update-in project :collections doall). Same caveat
+ ;; for other nested lazy seqs in the project hierarchy.
  (expect
   {:name "manuscript" :description "cheddarsled manuscript"}
   (in
@@ -201,6 +210,110 @@
          :description "the new description"))
       (collection-by-eid (:id collection))))))
 
+(expect
+ {:name "accidental astronauts manuscript" :word-count-mode :off}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts manuscript"))]
+      (update-collection!
+       (assoc collection
+         :name "accidental astronauts manuscript"
+         :word-count-mode :off))
+      (collection-by-eid (:id collection))))))
+
+(expect
+ {:name "accidental astronauts manuscript" :word-count-mode :automatic}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts manuscript"))]
+      (update-collection!
+       (assoc collection
+         :name "accidental astronauts manuscript"
+         :word-count-mode :automatic))
+      (collection-by-eid (:id collection))))))
+
+(expect
+ {:name "accidental astronauts research" :word-count-mode :manual :target 123456}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts research"))]
+      (update-collection!
+       (assoc collection
+         :name "accidental astronauts research"
+         :word-count-mode :manual
+         :target 123456))
+      (collection-by-eid (:id collection))))))
+
+(expect
+ {:name "accidental astronauts manuscript" :deadline-mode :off}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts manuscript"))]
+      (update-collection!
+       (assoc collection
+         :name "accidental astronauts manuscript"
+         :deadline-mode :off))
+      (collection-by-eid (:id collection))))))
+
+(expect
+ {:name "accidental astronauts manuscript" :deadline-mode :automatic}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts manuscript"))]
+      (update-collection!
+       (assoc collection
+         :name "accidental astronauts manuscript"
+         :deadline-mode :automatic))
+      (collection-by-eid (:id collection))))))
+
+(expect
+ {:name "accidental astronauts research" :deadline-mode :manual :deadline (tc/from-date #inst "2014-11-30T00:00:00.000-00:00")}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          collection (-> (data-project/projects-for-user-eid ryan-eid)
+                         (find-where :name "accidental astronauts")
+                         :id
+                         (data-project/project-by-eid {:depth :collection})
+                         :collections
+                         (find-where :name "accidental astronauts research"))]
+      (update-collection!
+       (assoc collection
+         :name "accidental astronauts research"
+         :deadline-mode :manual
+         :deadline #inst "2014-11-30T00:00:00.000-00:00"))
+      (collection-by-eid (:id collection))))))
+
 ;; Move collection up
 
 (expect
@@ -241,3 +354,17 @@
        (->> collections
             (sort-by :position)
             (map :name))))))
+
+;; Correct project when retrieved by collection
+(expect
+ true
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {proj-eid :id :as project} (-> (data-project/projects-for-user-eid ryan-eid)
+                                        (find-where :name "accidental astronauts")
+                                        :id
+                                        (data-project/project-by-eid {:depth :collection}))
+         {coll-eid :id} (-> project
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (= proj-eid (project-eid-for-collection-eid coll-eid)))))

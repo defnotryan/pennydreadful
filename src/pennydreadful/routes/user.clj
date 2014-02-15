@@ -2,14 +2,15 @@
   (:use compojure.core)
   (:require [cemerick.friend :as friend]
             [liberator.core :refer [defresource]]
-            [pennydreadful.util :refer [not-nil? parse-long]]
+            [pennydreadful.util :refer [not-nil? parse-long parse-int parse-inst]]
             [pennydreadful.auth :as auth]
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.user :as data-user]
             [pennydreadful.data.collection :as data-coll]
             [pennydreadful.data.project :as data-project]
             [pennydreadful.views.projects :as projects-view]
-            [pennydreadful.views.project :as project-view]))
+            [pennydreadful.views.project :as project-view]
+            [pennydreadful.views.collection :as collection-view]))
 
 (def resource-authenticated? (comp not-nil? friend/current-authentication :request))
 
@@ -77,13 +78,44 @@
    collection-eid))
 
 (defn collection-handle-ok [collection-eid {:keys [request] :as ctx}]
-  "OK")
+  (let [authn (friend/current-authentication request)
+        collection (data-coll/collection-by-eid collection-eid {:depth :snippet-names})
+        project-eid (data-coll/project-eid-for-collection-eid collection-eid)
+        project (data-project/project-by-eid project-eid {:depth :snippet-names})]
+    (collection-view/render {:project project :collection collection :username (:username authn)})))
 
 (defn collection-delete! [collection-eid ctx]
   (data-coll/delete-collection! collection-eid))
 
+(defn parse-target [{target :target :as params}]
+  (if target
+    (update-in params [:target] parse-int)
+    params))
+
+(defn parse-word-count-mode [{word-count-mode :word-count-mode :as params}]
+  (if word-count-mode
+    (update-in params [:word-count-mode] keyword)
+    params))
+
+(defn parse-deadline-mode [{deadline-mode :deadline-mode :as params}]
+  (if deadline-mode
+    (update-in params [:deadline-mode] keyword)
+    params))
+
+(defn parse-deadline [{deadline :deadline :as params}]
+  (if deadline
+    (update-in params [:deadline] parse-inst)
+    params))
+
+(def params->collection
+  (comp
+   parse-target
+   parse-word-count-mode
+   parse-deadline-mode
+   parse-deadline))
+
 (defn collection-put! [collection-eid ctx]
-  (let [collection (-> ctx :request :params)
+  (let [collection (-> ctx :request :params params->collection)
         safe-collection (assoc collection :id collection-eid)]
     (data-coll/update-collection! safe-collection)))
 

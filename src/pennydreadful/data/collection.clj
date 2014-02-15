@@ -1,5 +1,6 @@
 (ns pennydreadful.data.collection
   (:require [datomic.api :as d]
+            [clj-time.coerce :as tc]
             [pennydreadful.util :refer [denil not-nil?]]
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.folder :as data-folder]
@@ -11,15 +12,32 @@
     :collection/name (:name collection)
     :collection/description (:description collection)
     :collection/target (:target collection)
-    :collection/deadline (:deadline collection)}))
+    :collection/word-count-mode (case (:word-count-mode collection)
+                                  :manual :collection.word-count-mode/manual
+                                  :automatic :collection.word-count-mode/automatic
+                                  :collection.word-count-mode/off)
+    :collection/deadline-mode (case (:deadline-mode collection)
+                                :manual :collection.deadline-mode/manual
+                                :automatic :collection.deadline-mode/automatic
+                                :collection.deadline-mode/off)
+    :collection/deadline (some-> collection :deadline tc/to-date)}))
 
 (defn- hydrate [collection-entity]
   (denil
    {:id (:db/id collection-entity)
+    :entity :collection
     :name (:collection/name collection-entity)
     :description (:collection/description collection-entity)
     :target (:collection/target collection-entity)
-    :deadline (:collection/deadline collection-entity)
+    :word-count-mode (case (:collection/word-count-mode collection-entity)
+                       :collection.word-count-mode/manual :manual
+                       :collection.word-count-mode/automatic :automatic
+                       :off)
+    :deadline-mode (case (:collection/deadline-mode collection-entity)
+                     :collection.deadline-mode/manual :manual
+                     :collection.deadline-mode/automatic :automatic
+                     :off)
+    :deadline (some-> collection-entity :collection/deadline tc/from-date)
     :position (:collection/position collection-entity)}))
 
 (def collection-eid-owned-by-user-eid-query
@@ -32,6 +50,16 @@
   (let [db (d/db @data/conn)
         results (d/q collection-eid-owned-by-user-eid-query db user-eid collection-eid)]
     (not-nil? (ffirst results))))
+
+(def project-eid-for-collection-eid-query
+  '[:find ?project-eid
+    :in $ ?collection-eid
+    :where [?project-eid :project/collections ?collection-eid]])
+
+(defn project-eid-for-collection-eid [collection-eid]
+  (let [db (d/db @data/conn)
+        results (d/q project-eid-for-collection-eid-query db collection-eid)]
+    (ffirst results)))
 
 (defn- get-shallow [collection-eid]
   (-> @data/conn
@@ -58,6 +86,7 @@
    (case depth
      :collection (get-shallow collection-eid)
      :snippet-names (get-with-children collection-eid :snippet-names)
+     :snippet (get-with-children collection-eid :snippet)
      (get-shallow collection-eid))))
 
 (defn insert-collection! [project-eid collection]

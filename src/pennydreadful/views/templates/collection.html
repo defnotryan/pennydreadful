@@ -124,9 +124,9 @@
       </div>
 
       <div id="children-list">
-        <div class="folder child panel" id="child-panel-1111">
-          <h3><span class="child-title" data-id="1111" contenteditable="true">Folder Title</span></h3>
-          <div class="child-description textblock" contenteditable="true" data-id="1111">Folder description</div>
+        <div class="folder child panel" id="folder-panel-1111">
+          <h3><i class="fa fa-folder-open fa-fw"></i><span class="folder-title" data-id="1111" contenteditable="true">Folder Title</span></h3>
+          <div class="folder-description textblock" contenteditable="true" data-id="1111">Folder description</div>
           <div class="row">
             <div class="large-12 columns clearfix">
               <ul class="button-group right">
@@ -137,9 +137,9 @@
           </div>
         </div>
 
-        <div class="snippet child panel" id="child-panel-2222">
-          <h3><span class="child-title" data-id="2222" contenteditable="true">Snippet Title</span></h3>
-          <div class="child-description textblock" contenteditable="true" data-id="2222">Snippet description</div>
+        <div class="snippet child panel" id="snippet-panel-2222">
+          <h3><i class="fa fa-file-text-o fa-fw"></i><span class="snippet-title" data-id="2222" contenteditable="true">Snippet Title</span></h3>
+          <div class="snippet-description textblock" contenteditable="true" data-id="2222">Snippet description</div>
           <div class="row">
             <div class="large-12 columns clearfix">
               <ul class="button-group right">
@@ -238,38 +238,8 @@
             <div class="large-11 columns"><label for="deadline-manual">Manually set deadline to:</label></div>
           </div>
           <div class="row">
-            <div class="large-1 columns"></div>
-            <div class="large-2 columns">
-              <select id="deadline-day" placeholder="Day">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
-            </div>
-            <div class="large-7 columns">
-              <select id="deadline-month">
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-                <option value="April">April</option>
-                <option value="May">May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
-              </select>
-            </div>
-            <div class="large-2 columns">
-              <select id="deadline-year">
-                <option value="2014">2014</option>
-                <option value="2015">2015</option>
-                <option value="2016">2016</option>
-                <option value="2017">2017</option>
-                <option value="2018">2018</option>
-              </select>
+            <div class="large-11 large-offset-1 columns">
+              <input type="date" id="deadline-manual-value"/>
             </div>
           </div>
           <div class="row">

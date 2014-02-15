@@ -21,6 +21,15 @@ font-weight: normal;
 	text-rendering: optimizeLegibility;
 }
 
+#project-title a {
+	color: #222;
+	text-decoration: none;
+}
+
+#project-title a:hover {
+	color: #000;
+}
+
 #project-tree a {
 	color: #222;
 	text-decoration: none;

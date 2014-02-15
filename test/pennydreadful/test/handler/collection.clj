@@ -2,6 +2,7 @@
   (:require [expectations :refer :all]
             [ring.mock.request :refer :all]
             [clojure.edn :as edn]
+            [clj-time.coerce :as tc]
             [pennydreadful.handler :refer [app]]
             [pennydreadful.test.util :refer :all]
             [pennydreadful.data.user :as data-user]
@@ -126,7 +127,7 @@
 
 ;; PUT collection changes database
 (expect
- {:name "accidental astronauts manuscript" :description "new description"}
+ {:name "accidental astronauts manuscript" :description "new description" :word-count-mode :manual :target 123456}
  (in
   (login/as-ryan
    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
@@ -137,7 +138,23 @@
                             :collections
                             (find-where :name "accidental astronauts manuscript"))]
      (-> (request :put (str "/collection/" coll-eid))
-         (body {:description "new description"})
+         (body {:description "new description" :word-count-mode "manual" :target 123456})
+         app)
+     (data-coll/collection-by-eid coll-eid)))))
+
+(expect
+ {:name "accidental astronauts manuscript" :description "new description" :deadline-mode :manual :deadline (tc/from-date #inst "2014-11-29T00:00:00.000-00:00")}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                            (find-where :name "accidental astronauts")
+                            :id
+                            (data-project/project-by-eid {:depth :collection})
+                            :collections
+                            (find-where :name "accidental astronauts manuscript"))]
+     (-> (request :put (str "/collection/" coll-eid))
+         (body {:description "new description" :deadline-mode "manual" :deadline "2014-11-29T00:00:00.000-00:00"})
          app)
      (data-coll/collection-by-eid coll-eid)))))
 

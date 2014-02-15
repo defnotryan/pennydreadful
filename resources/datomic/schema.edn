@@ -59,11 +59,49 @@
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
+  :db/ident :collection/word-count-mode
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Collection's target word count mode"
+  :db.install/_attribute :db.part/db}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This collection has no word count target"
+      :db/ident :collection.word-count-mode/off}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This collection's word count target is automatically aggregated from its decendants"
+      :db/ident :collection.word-count-mode/automatic}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This collection's word count is set manually in the :collection/target attribute"
+      :db/ident :collection.word-count-mode/manual}
+
+ {:db/id #db/id[:db.part/db]
   :db/ident :collection/target
   :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
-  :db/doc "Target word count for collection"
+  :db/doc "Target word count for collection (when :collection/word-count-mode is :collection.word-count-mode/manual)"
   :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :collection/deadline-mode
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Collection's deadline mode"
+  :db.install/_attribute :db.part/db}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This collection has no deadline"
+      :db/ident :collection.deadline-mode/off}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This collection's deadline is automatically aggregated from its descendants"
+      :db/ident :collection.deadline-mode/automatic}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This collection's deadline is set manually in the :collection/deadline attribute"
+      :db/ident :collection.deadline-mode/manual}
 
  {:db/id #db/id[:db.part/db]
   :db/ident :collection/deadline
@@ -102,11 +140,55 @@
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
+  :db/ident :folder/word-count-mode
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Folder's target word count mode"
+  :db.install/_attribute :db.part/db}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This folder has no word count target"
+      :db/ident :folder.word-count-mode/off}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This folder's word count target is set manually in the :folder/target attribute"
+      :db/ident :folder.word-count-mode/manual}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This folder's word count target is automatically aggregated from its children"
+      :db/ident :folder.word-count-mode/automatic}
+
+ {:db/id #db/id[:db.part/db]
   :db/ident :folder/target
   :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
-  :db/doc "Target word count for folder"
+  :db/doc "Target word count for folder when :folder/word-count-mode is set to :folder.word-count-mode/manual"
   :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :folder/deadline-mode
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Folder's deadline mode"
+  :db.install/_attribute :db.part/db}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This folder has no deadline"
+      :db/ident :folder.deadline/off}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This folder's deadline is manually set in the :folder/deadline attribute"
+      :db/ident :folder.deadline/manual}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This folder's deadline is automatically aggregated from its children"
+      :db/ident :folder.deadline/automatic}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :folder/deadline
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db/doc "Folder's deadline when :folder/deadline-mode is set to :folder.deadline/manual"}
 
  {:db/id #db/id[:db.part/db]
   :db/ident :folder/position
@@ -141,6 +223,50 @@
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db/doc "Snippet content"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :snippet/word-count-mode
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Snippet's word count target mode"
+  :db.install/_attribute :db.part/db}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This snippet has no word count target"
+      :db/ident :snippet.word-count-mode/off}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This snippet's word count target is set manually in the :snippet/target attribute"
+      :db/ident :snippet.word-count-mode/manual}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :snippet/target
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db/doc "This snippet's word count target when :snippet/word-count-mode is set to :snippet.word-count-mode/manual"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :snippet/deadline-mode
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "This snippet's deadline mode"
+  :db.install/_attribute :db.part/db}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This snippet has no deadline"
+      :db/ident :snippet.deadline-mode/off}
+
+     {:db/id #db/id[:db.part/db]
+      :db/doc "This snippet's deadline is set manually in the :snippet/deadline attribute"
+      :db/ident :snippet.deadline-mode/manual}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :snippet/deadline
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db/doc "Snippet's deadline when :snippet/deadline-mode is set to :snippet.deadline/off"
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]

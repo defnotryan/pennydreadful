@@ -85,7 +85,7 @@
   ([collection-eid {:keys [depth] :as opts}]
    (case depth
      :collection (get-shallow collection-eid)
-     :snippet-names (get-with-children collection-eid :snippet-names)
+     :snippet-meta (get-with-children collection-eid :snippet-meta)
      :snippet (get-with-children collection-eid :snippet)
      (get-shallow collection-eid))))
 

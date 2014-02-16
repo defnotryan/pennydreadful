@@ -1,5 +1,6 @@
 (ns pennydreadful.data.snippet
   (:require [datomic.api :as d]
+            [clj-time.coerce :as tc]
             [pennydreadful.util :refer [denil]]
             [pennydreadful.data.datomic :as data]))
 
@@ -10,7 +11,15 @@
     :snippet/description (:description snippet)
     :snippet/content (:content snippet)
     :snippet/create-date (:create-date snippet)
-    :snippet/last-edit-date (:last-edit-date snippet)}))
+    :snippet/last-edit-date (:last-edit-date snippet)
+    :snippet/target (:target snippet)
+    :snippet/deadline (some-> snippet :deadline tc/to-date)
+    :snippet/word-count-mode (case (:word-count-mode snippet)
+                               :manual :snippet.word-count-mode/manual
+                               :snippet.word-count-mode/off)
+    :snippet/deadline-mode (case (:deadline-mode snippet)
+                             :manual :snippet.deadline-mode/manual
+                             :snippet.deadline-mode/off)}))
 
 (defn- hydrate [snippet-entity]
   (denil
@@ -20,14 +29,23 @@
     :description (:snippet/description snippet-entity)
     :content (:snippet/content snippet-entity)
     :create-date (:snippet/create-date snippet-entity)
-    :last-edit-date (:snippet/last-edit-date snippet-entity)}))
+    :last-edit-date (:snippet/last-edit-date snippet-entity)
+    :target (:snippet/target snippet-entity)
+    :word-count-mode (case (:snippet/word-count-mode snippet-entity)
+                       :snippet.word-count-mode/manual :manual
+                       :off)
+    :deadline-mode (case (:snippet/deadline-mode snippet-entity)
+                     :snippet.deadline-mode/manual :manual
+                     :off)
+    :deadline (some-> snippet-entity :snippet/deadline tc/from-date)}))
 
 (defn- hydrate-lite [snippet-entity]
   (denil
    {:id (:db/id snippet-entity)
-    :name (:snippet/name snippet-entity)}))
+    :name (:snippet/name snippet-entity)
+    :description (:snippet/description snippet-entity)}))
 
 (defn snippet-by-entity [ent depth]
-  (if (= depth :snippet-names)
+  (if (= depth :snippet-meta)
     (hydrate-lite ent)
     (hydrate ent)))

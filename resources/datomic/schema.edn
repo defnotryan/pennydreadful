@@ -174,15 +174,15 @@
 
      {:db/id #db/id[:db.part/db]
       :db/doc "This folder has no deadline"
-      :db/ident :folder.deadline/off}
+      :db/ident :folder.deadline-mode/off}
 
      {:db/id #db/id[:db.part/db]
       :db/doc "This folder's deadline is manually set in the :folder/deadline attribute"
-      :db/ident :folder.deadline/manual}
+      :db/ident :folder.deadline-mode/manual}
 
      {:db/id #db/id[:db.part/db]
       :db/doc "This folder's deadline is automatically aggregated from its children"
-      :db/ident :folder.deadline/automatic}
+      :db/ident :folder.deadline-mode/automatic}
 
  {:db/id #db/id[:db.part/db]
   :db/ident :folder/deadline

@@ -59,7 +59,7 @@
 
 (defn project-handle-ok [project-eid {:keys [request] :as ctx}]
   (let [authn (friend/current-authentication request)
-        project (data-project/project-by-eid project-eid {:depth :snippet-names})]
+        project (data-project/project-by-eid project-eid {:depth :snippet-meta})]
     (project-view/render {:project project :username (:username authn)})))
 
 (defresource project-resource [project-eid]
@@ -79,9 +79,9 @@
 
 (defn collection-handle-ok [collection-eid {:keys [request] :as ctx}]
   (let [authn (friend/current-authentication request)
-        collection (data-coll/collection-by-eid collection-eid {:depth :snippet-names})
+        collection (data-coll/collection-by-eid collection-eid {:depth :snippet-meta})
         project-eid (data-coll/project-eid-for-collection-eid collection-eid)
-        project (data-project/project-by-eid project-eid {:depth :snippet-names})]
+        project (data-project/project-by-eid project-eid {:depth :snippet-meta})]
     (collection-view/render {:project project :collection collection :username (:username authn)})))
 
 (defn collection-delete! [collection-eid ctx]

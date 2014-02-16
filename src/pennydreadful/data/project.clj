@@ -63,7 +63,7 @@
    (case depth
      :project (get-shallow project-eid)
      :collection (get-with-collections project-eid :collection)
-     :snippet-names (get-with-collections project-eid :snippet-names)
+     :snippet-meta (get-with-collections project-eid :snippet-meta)
      :snippet (get-with-collections project-eid :snippet)
      (get-shallow project-eid))))
 

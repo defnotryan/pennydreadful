@@ -95,7 +95,7 @@
       (-> (data-project/projects-for-user-eid ryan-eid)
           (find-where :name "accidental astronauts")
           :id
-          (data-project/project-by-eid {:depth :snippet-names})
+          (data-project/project-by-eid {:depth :snippet-meta})
           :collections
           (find-where :name "accidental astronauts manuscript")
           :children
@@ -111,7 +111,7 @@
       (-> (data-project/projects-for-user-eid ryan-eid)
           (find-where :name "accidental astronauts")
           :id
-          (data-project/project-by-eid {:depth :snippet-names})
+          (data-project/project-by-eid {:depth :snippet-meta})
           :collections
           (find-where :name "accidental astronauts research")
           :children
@@ -130,7 +130,7 @@
       (-> (data-project/projects-for-user-eid ryan-eid)
           (find-where :name "accidental astronauts")
           :id
-          (data-project/project-by-eid {:depth :snippet-names})
+          (data-project/project-by-eid {:depth :snippet-meta})
           pprint-str
           print))))
 

@@ -94,8 +94,7 @@
  {:db/id #db/id[:db.part/user -3000007]
   :collection/name "dwindling dandies manuscript"
   :collection/description "description here"
-  :collection/word-count-mode :collection.word-count-mode/manual
-  :collection/target 2000
+  :collection/word-count-mode :collection.word-count-mode/automatic
   :collection/deadline-mode :collection.deadline-mode/manual
   :collection/deadline #inst "2014-11-30T00:00:00.000-00:00"
   :collection/position 0
@@ -115,6 +114,7 @@
  {:db/id #db/id[:db.part/user -4000001]
   :folder/name "aa folder A"
   :folder/description "accidental astronauts folder A"
+  :folder/word-count-mode :folder.word-count-mode/manual
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -5000001] #db/id[:db.part/user -4000002]]}
 
@@ -126,7 +126,7 @@
  {:db/id #db/id[:db.part/user -4000003]
   :folder/name "aa folder B"
   :folder/description "accidental astronauts folder B"
-  :folder/target 2000
+  :folder/word-count-mode :folder.word-count-mode/off
   :folder/children [#db/id[:db.part/user -4000004] #db/id[:db.part/user -4000005]]}
 
  {:db/id #db/id[:db.part/user -4000004]
@@ -199,11 +199,14 @@
  {:db/id #db/id[:db.part/user -4000016]
   :folder/name "dd folder A"
   :folder/description "dwindling dandies folder A"
-  :folder/target 2000
+  :folder/word-count-mode :folder.word-count-mode/automatic
+  :folder/deadline-mode :folder.deadline-mode/automatic
   :folder/children [#db/id[:db.part/user -5000013] #db/id[:db.part/user -4000017]]}
 
  {:db/id #db/id[:db.part/user -4000017]
   :folder/name "dd folder AB"
+  :folder/word-count-mode :folder.word-count-mode/automatic
+  :folder/deadline-mode :folder.deadline-mode/automatic
   :folder/description "dwindling dandies folder AB"
   :folder/target 2000}
 
@@ -314,7 +317,11 @@
  {:db/id #db/id[:db.part/user -5000013]
   :snippet/name "dd snippet A1"
   :snippet/description "dwindling dandies snippet A1"
+  :snippet/word-count-mode :snippet.word-count-mode/manual
+  :snippet/target 2000
   :snippet/content "content here"
+  :snippet/deadline-mode :snippet.deadline-mode/manual
+  :snippet/deadline #inst "2014-11-15T00:00:00.000-00:00"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
 
@@ -322,6 +329,10 @@
   :snippet/name "dd snippet 1"
   :snippet/description "dwindling dandies snippet 1"
   :snippet/content "content here"
+  :snippet/word-count-mode :snippet.word-count-mode/manual
+  :snippet/target 1000
+  :snippet/deadline-mode :snippet.deadline-mode/manual
+  :snippet/deadline #inst "2014-11-30T00:00:00.000-00:00"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
 

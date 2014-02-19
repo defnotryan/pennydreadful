@@ -26,7 +26,8 @@
   [:section.deps] (substitute (views.base/base-deps))
   [:#project-nav] (substitute (views.tree/project-nav-tree project (:id collection)))
   [:#collection-title] (content (:name collection))
-  [:#collection-description] (content (:description collection))
+  [:#collection-eid] (set-attr :value (:id collection))
+  [:#collection-description] (html-content (:description collection))
   [:#children-list] (content
                      (map
                       (fn [{entity-type :entity :as child}]

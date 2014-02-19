@@ -1,1 +1,0 @@
-(ns pennydreadful.client.collection.data)

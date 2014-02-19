@@ -15,6 +15,11 @@
         (let [[k v] (string/split pair #"=")]
           (when k [(keyword k) v]))))))
 
+(defn default-string [s default]
+  (if (string/blank? s)
+    default
+    s))
+
 (def query-params (parse-params (.-location js/window)))
 
 (defn extract-id [node]

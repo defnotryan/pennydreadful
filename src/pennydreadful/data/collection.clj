@@ -40,17 +40,6 @@
     :deadline (some-> collection-entity :collection/deadline tc/from-date)
     :position (:collection/position collection-entity)}))
 
-(def collection-eid-owned-by-user-eid-query
-  '[:find ?collection-eid
-    :in $ ?user-eid ?collection-eid
-    :where [?user-eid :user/projects ?project-eid]
-           [?project-eid :project/collections ?collection-eid]])
-
-(defn collection-eid-owned-by-user-eid? [collection-eid user-eid]
-  (let [db (d/db @data/conn)
-        results (d/q collection-eid-owned-by-user-eid-query db user-eid collection-eid)]
-    (not-nil? (ffirst results))))
-
 (def project-eid-for-collection-eid-query
   '[:find ?project-eid
     :in $ ?collection-eid
@@ -110,3 +99,12 @@
 
 (defn move-down! [collection-eid]
   @(d/transact @data/conn [[:move-down-collection-position collection-eid]]))
+
+(defn owned-eids [collection-entity]
+  (concat
+   (map :db/id (:collection/children collection-entity))
+   (mapcat
+    (fn [child-entity]
+      (when (:folder/name child-entity) ;; if it's a folder
+        (data-folder/owned-eids child-entity)))
+    (:collection/children collection-entity))))

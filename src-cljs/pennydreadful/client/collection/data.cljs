@@ -12,6 +12,10 @@
 (def updated-collection-meta (chan 3))
 (def update-collection-meta-errors (chan 3))
 
+(def folders-to-create (chan 1))
+(def created-folders (chan 1))
+(def create-folder-errors (chan 1))
+
 ;; PUT collection description updates in collection-descriptions-to-update
 (go-forever
  (let [collection (<! collection-meta-to-update)]

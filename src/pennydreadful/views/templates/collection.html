@@ -182,10 +182,15 @@
 
       <div class="panel">
         <h4>Progress</h4>
-        <p><span id="current-wc">1264</span> of <span id="target-wc">2000</span> words</p>
-        <div class="progress" style="margin-top:0.8em">
-          <span class="meter" style="width:60%"></span>
+        <input type="hidden" id="auto-wc" value="4000"/>
+        <input type="hidden" id="manual-wc" value="4000"/>
+        <input type="hidden" id="current-wc" value="1264"/>
+        <input type="hidden" id="word-count-mode" value="off"/>
+        <p class="progress-on"><span class="current-wc">1264</span> of <span id="target-wc">2000</span> words</p>
+        <div class="progress progress-on" style="margin-top:0.8em">
+          <span id="progress-meter" class="meter" style="width:60%"></span>
         </div>
+        <p class="progress-off hide"><span class="current-wc">1264</span> words <small>(click "Edit" to set a target)</small></p>
         <a id="edit-progress-button" data-reveal-id="edit-progress-dialog" class="tiny button"><i class="fa fa-pencil"></i> Edit</a>
         <div id="edit-progress-dialog" class="reveal-modal small" data-reveal>
           <h2>Progress Settings</h2>
@@ -203,7 +208,7 @@
             <div class="large-11 columns"><label for="target-manual">Manually set target to:</label></div>
           </div>
           <div class="row">
-            <div class="large-11 large-offset-1 columns"><input type="text" id="target-manual-value" placeholder="target word count"/></div>
+            <div class="large-11 large-offset-1 columns"><input type="text" id="target-manual-value" placeholder="target word count"/><small class="error" style="display:none" id="target-manual-value-error">Must be a number</small></div>
           </div>
           <div class="row">
             <div class="large-12 columns clearfix">
@@ -219,13 +224,17 @@
 
       <div class="panel">
         <h4>Deadline</h4>
-        <p>Due <span data-tooltip class="has-tip" title="20 April 2014 at 5:00pm">in 90 days</span>!</p>
+        <input type="hidden" id="auto-deadline" value="2014-05-10"/>
+        <input type="hidden" id="manual-deadline" value="2014-04-20"/>
+        <input type="hidden" id="deadline-mode" value="off"/>
+        <p class="deadline-on">Due <span id="deadline-reminder" data-tooltip class="has-tip" title="20 April 2014">in 90 days</span>!</p>
+        <p class="deadline-off hide">No deadline <small>(click "Edit" to set a deadline)</small></p>
         <a id="edit-deadline-button" data-reveal-id="edit-deadline-dialog" class="tiny button"><i class="fa fa-pencil"></i> Edit</a>
         <div id="edit-deadline-dialog" class="reveal-modal small" data-reveal>
           <h2>Deadline Settings</h2>
           <p>You can set the deadline to automatic and it will reflect the latest deadline among all the folders and snippets this collection contains. You can also set it manually, or just turn it off.</p>
           <div class="row">
-            <div class="large-1 columns"><input type="radio" name="deadline-mode" id="deadline-off"></div>
+            <div class="large-1 columns"><input type="radio" name="deadline-mode" id="deadline-off" checked="checked"></div>
             <div class="large-11 columns"><label for="deadline-off">Turn deadline off</label></div>
           </div>
           <div class="row">
@@ -239,6 +248,7 @@
           <div class="row">
             <div class="large-11 large-offset-1 columns">
               <input type="date" id="deadline-manual-value"/>
+              <small class="error" style="display:none" id="deadline-manual-value-error">Please enter a date, or turn the deadline off</small>
             </div>
           </div>
           <div class="row">

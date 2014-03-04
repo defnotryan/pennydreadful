@@ -1,5 +1,7 @@
 (ns pennydreadful.client.util
   (:require [clojure.string :as string]
+            [goog.string :as gstr]
+            [goog.string.format]
             [enfocus.core :as ef]
             [ajax.core]
             [tailrecursion.javelin])
@@ -19,6 +21,8 @@
   (if (string/blank? s)
     default
     s))
+
+(def format gstr/format)
 
 (def query-params (parse-params (.-location js/window)))
 

@@ -39,7 +39,7 @@
  (with-populated-db
    (let [ryan (data-user/user-for-username "ryan")
          project (insert-project! (:id ryan) {:name "surreal serpents" :description "sssurreal ssserpentsss"})]
-     (project-eid-owned-by-user-eid? (:id project) (:id ryan)))))
+     (some #{(:id project)} (data-user/owned-eids (:id ryan))))))
 
 ;; Delete a project
 (expect

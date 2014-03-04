@@ -63,7 +63,7 @@
 
 ;; Ownership
 (expect
- true
+ identity ;; expect truthy
  (with-populated-db
    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
          {coll-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
@@ -72,10 +72,10 @@
                             (data-project/project-by-eid {:depth :collection})
                             :collections
                             (find-where :name "accidental astronauts manuscript"))]
-     (collection-eid-owned-by-user-eid? coll-eid ryan-eid))))
+     (some #{coll-eid} (data-user/owned-eids ryan-eid)))))
 
 (expect
- false
+ not ;; expect falsey
  (with-populated-db
    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
          {rhea-eid :id} (data-user/user-for-username "rhea")
@@ -85,7 +85,7 @@
                             (data-project/project-by-eid {:depth :collection})
                             :collections
                             (find-where :name "accidental astronauts manuscript"))]
-     (collection-eid-owned-by-user-eid? coll-eid rhea-eid))))
+     (some #{coll-eid} (data-user/owned-eids rhea-eid)))))
 
  ;; Retrieve nested
 (expect

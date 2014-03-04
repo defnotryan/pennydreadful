@@ -1,7 +1,7 @@
 (ns pennydreadful.data.folder
   (:require [datomic.api :as d]
             [clj-time.coerce :as tc]
-            [pennydreadful.util :refer [denil]]
+            [pennydreadful.util :refer [denil not-nil?]]
             [pennydreadful.data.datomic :as data]
             [pennydreadful.data.snippet :as data-snippet]))
 
@@ -41,6 +41,14 @@
                      :off)
     :deadline (some-> folder-entity :folder/deadline tc/from-date)}))
 
+(defn insert-folder-into-collection! [collection-eid folder]
+  (let [tempid (d/tempid :db.part/user)
+        folder-entity (-> folder (assoc :id tempid) dehydrate)
+        facts [folder-entity {:db/id collection-eid :collection/children tempid}]
+        result @(d/transact @data/conn facts)
+        id (data/tempid->id result tempid)]
+    (hydrate (d/entity (:db-after result) id))))
+
 (declare folder-by-entity)
 
 (defn- get-child [child-eid depth]
@@ -53,3 +61,12 @@
   (let [child-eids (map :db/id (:folder/children ent))
         folder (hydrate ent)]
     (assoc folder :children (map #(get-child % depth) child-eids))))
+
+(defn owned-eids [folder-entity]
+  (concat
+   (map :db/id (:folder/children folder-entity))
+   (mapcat
+    (fn [child-entity]
+      (when (:folder/name child-entity)
+        (owned-eids child-entity)))
+    (:folder/children folder-entity))))

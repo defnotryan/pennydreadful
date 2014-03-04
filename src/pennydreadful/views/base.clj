@@ -11,6 +11,7 @@
   [[:script (attr-ends :src "jquery.js")]] (set-attr :src "/js/jquery.js")
   [[:script (attr-ends :src "underscore.min.js")]] (set-attr :src "/js/underscore.min.js")
   [[:script (attr-ends :src "spin.min.js")]] (set-attr :src "/js/spin.min.js")
+  [[:script (attr-ends :src "moment.min.js")]] (set-attr :src "/js/moment.min.js")
   [[:script (attr-ends :src "site.js")]] (set-attr :src "/js/site.js")
   [:script#launch] (content (str cljs-launch-ns ".init()")))
 

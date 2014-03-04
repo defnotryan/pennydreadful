@@ -10,7 +10,15 @@
     (pprint x w)
     (.toString w)))
 
+(defn chain-pprint [x]
+  (pprint x)
+  x)
+
 (def not-nil? (complement nil?))
+
+(defn protect [unsafe-value value]
+  (when-not (= unsafe-value value)
+    value))
 
 (defn denil [m]
   "Derives a map from m where keys mapped to nil have been dissoc'ed."

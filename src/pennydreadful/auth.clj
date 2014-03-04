@@ -8,8 +8,5 @@
 (defn credentials [username]
   (data-user/user-for-username username))
 
-(defn user-eid-can-mutate-project-eid? [user-eid project-eid]
-  (not-nil? (data-project/project-eid-owned-by-user-eid? project-eid user-eid)))
-
-(defn user-eid-can-mutate-collection-eid? [user-eid collection-eid]
-  (data-coll/collection-eid-owned-by-user-eid? collection-eid user-eid))
+(defn user-eid-can-mutate-eid? [user-eid eid]
+  (some #{eid} data-user/owned-eids))

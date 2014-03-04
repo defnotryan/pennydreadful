@@ -14,11 +14,14 @@
     (sum-words (:content item))
     (walk word-count #(apply + %) (:children item))))
 
-(defn word-count-target-aggregated [{:keys [word-count-mode target] :as item}]
-  (case word-count-mode
-    :manual target
-    :automatic (->> item :children (map word-count-target-aggregated) (apply +))
-    :off 0))
+(defn word-count-target-aggregated
+  ([{:keys [word-count-mode target] :as item} top-override]
+   (case (or top-override word-count-mode)
+     :manual target
+     :automatic (->> item :children (map word-count-target-aggregated) (apply +))
+     :off 0))
+  ([item]
+   (word-count-target-aggregated item nil)))
 
 (defn nil-greatest [& instants]
   "Returns the greatest/latest argument that isn't nil"
@@ -27,8 +30,11 @@
        sort
        last))
 
-(defn deadline-aggregated [{:keys [deadline-mode deadline] :as item}]
-  (case deadline-mode
-    :manual deadline
-    :automatic (->> item :children (map deadline-aggregated) (apply nil-greatest))
-    :off nil))
+(defn deadline-aggregated
+  ([{:keys [deadline-mode deadline] :as item} top-override]
+   (case (or top-override deadline-mode)
+     :manual deadline
+     :automatic (->> item :children (map deadline-aggregated) (apply nil-greatest))
+     :off nil))
+  ([item]
+   (deadline-aggregated item nil)))

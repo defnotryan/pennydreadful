@@ -5,6 +5,7 @@
             [pennydreadful.util :refer [not-nil? parse-long parse-int parse-inst]]
             [pennydreadful.auth :as auth]
             [pennydreadful.data.datomic :as data]
+            [pennydreadful.data.aggregation :as data-agg]
             [pennydreadful.data.user :as data-user]
             [pennydreadful.data.collection :as data-coll]
             [pennydreadful.data.project :as data-project]
@@ -45,7 +46,7 @@
                          (friend/throw-unauthorized nil nil)))
 
 (defn resource-mutation-allowed? [project-eid {:keys [request]}]
-  (auth/user-eid-can-mutate-project-eid?
+  (auth/user-eid-can-mutate-eid?
    (:id (friend/current-authentication request))
    project-eid))
 
@@ -73,16 +74,20 @@
 
 
 (defn collection-mutation-allowed? [collection-eid {:keys [request]}]
-  (auth/user-eid-can-mutate-collection-eid?
+  (auth/user-eid-can-mutate-eid?
    (:id (friend/current-authentication request))
    collection-eid))
 
 (defn collection-handle-ok [collection-eid {:keys [request] :as ctx}]
   (let [authn (friend/current-authentication request)
-        collection (data-coll/collection-by-eid collection-eid {:depth :snippet-meta})
+        collection (data-coll/collection-by-eid collection-eid {:depth :snippet})
         project-eid (data-coll/project-eid-for-collection-eid collection-eid)
-        project (data-project/project-by-eid project-eid {:depth :snippet-meta})]
-    (collection-view/render {:project project :collection collection :username (:username authn)})))
+        project (data-project/project-by-eid project-eid {:depth :snippet-meta})
+        view-context {:project project :collection collection :username (:username authn)}]
+    (collection-view/render (-> view-context
+                                (assoc-in [:collection :word-count] (data-agg/word-count collection))
+                                (assoc-in [:collection :auto-target] (data-agg/word-count-target-aggregated collection :automatic))
+                                (assoc-in [:collection :auto-deadline] (data-agg/deadline-aggregated collection :automatic))))))
 
 (defn collection-delete! [collection-eid ctx]
   (data-coll/delete-collection! collection-eid))

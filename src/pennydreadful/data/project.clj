@@ -67,8 +67,10 @@
      :snippet (get-with-collections project-eid :snippet)
      (get-shallow project-eid))))
 
-(defn project-eid-owned-by-user-eid? [project-eid user-eid]
-  (some #{project-eid} (project-eids-for-user-eid user-eid)))
-
 (defn delete-project! [project-eid]
   @(d/transact @data/conn [[:db.fn/retractEntity project-eid]]))
+
+(defn owned-eids [project-entity]
+  (concat
+   (map :db/id (:project/collections project-entity))
+   (mapcat data-collection/owned-eids (:project/collections project-entity))))

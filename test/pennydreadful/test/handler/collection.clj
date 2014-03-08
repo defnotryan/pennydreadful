@@ -96,7 +96,7 @@
         response (post-new {:name "accidental astronaut archives"} proj-eid)]
     (get-in response [:headers "Location"]))))
 
-;; POST collection actuall adds collection to database
+;; POST collection actually adds collection to database
 (expect
  #{"accidental astronauts manuscript" "accidental astronauts research" "accidental astronauts archives"}
  (login/as-ryan
@@ -108,6 +108,17 @@
                           (data-project/project-by-eid {:depth :collection})
                           :collections)]
       (into #{} (map :name collections))))))
+
+;; Cannot POST collection to someone else's project
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let[{ryan-eid :id} (data-user/user-for-username "ryan")
+        {rhea-eid :id} (data-user/user-for-username "rhea")
+        {proj-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                           (find-where :name "condescending cougars"))]
+     (post-new {:name "condescending cougars archives"} proj-eid)))))
 
 ;; PUT collection response
 (expect

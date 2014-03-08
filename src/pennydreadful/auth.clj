@@ -9,4 +9,4 @@
   (data-user/user-for-username username))
 
 (defn user-eid-can-mutate-eid? [user-eid eid]
-  (some #{eid} data-user/owned-eids))
+  (some #{eid} (data-user/owned-eids user-eid)))

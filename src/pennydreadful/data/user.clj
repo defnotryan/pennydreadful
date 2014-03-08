@@ -30,5 +30,5 @@
         user-entity (d/entity db user-eid)
         project-entities (:user/projects user-entity)]
     (concat
-     (map :db/id project-entities))
-     (mapcat data-project/owned-eids project-entities)))
+     (map :db/id project-entities)
+     (mapcat data-project/owned-eids project-entities))))

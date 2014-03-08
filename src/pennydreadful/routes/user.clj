@@ -9,6 +9,7 @@
             [pennydreadful.data.user :as data-user]
             [pennydreadful.data.collection :as data-coll]
             [pennydreadful.data.project :as data-project]
+            [pennydreadful.data.folder :as data-folder]
             [pennydreadful.views.projects :as projects-view]
             [pennydreadful.views.project :as project-view]
             [pennydreadful.views.collection :as collection-view]))
@@ -176,6 +177,26 @@
   :put! #(collection-move-down! collection-eid %)
   :handle-created collections-handle-created)
 
+(defn folder-post! [collection-eid {:keys [request] :as ctx}]
+  (let [folder (:params request)
+        inserted-folder (data-folder/insert-folder-into-collection! collection-eid folder)]
+    {::folder inserted-folder}))
+
+(defn folder-header-location [{:keys [request] :as ctx}]
+  (when (#{:post} (:request-method request))
+    (str "/folder/" (get-in ctx [::folder :id]))))
+
+(defn folder-handle-created [ctx]
+  (pr-str (::folder ctx)))
+
+(defresource collection-folder-resource [collection-eid]
+  :allowed-methods [:post]
+  :available-media-types ["text/html"]
+  :authorized? (partial collection-mutation-allowed? collection-eid)
+  :post! (partial folder-post! collection-eid)
+  :location folder-header-location
+  :handle-created folder-handle-created)
+
 (defroutes user-routes
 
   (GET "/" [] (projects-resource))
@@ -190,4 +211,6 @@
 
   (PUT "/collection/:collection-eid/move-down" [collection-eid] (collection-move-down (parse-long collection-eid)))
 
-  (POST "/project/:project-eid/collection" [project-eid] (project-collection-resource (parse-long project-eid))))
+  (POST "/project/:project-eid/collection" [project-eid] (project-collection-resource (parse-long project-eid)))
+
+  (POST "/collection/:collection-eid/folder" [collection-eid] (collection-folder-resource (parse-long collection-eid))))

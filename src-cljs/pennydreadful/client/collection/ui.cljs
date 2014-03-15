@@ -242,6 +242,14 @@
              {:name @new-folder-name
               :description "Type here to add a description."}]))))
 
+(defn submit>new-folder-form [event]
+  (.preventDefault event)
+  (when @new-folder-name-valid?
+    (go (>! data/folders-to-create
+            [@collection-eid
+             {:name @new-folder-name
+              :description "Type here to add a description"}]))))
+
 (defn change>new-snippet-name [event]
   (reset! new-snippet-name (-> event .-target .-value)))
 
@@ -272,6 +280,7 @@
   "#new-folder-name-input" (ee/listen :change change>new-folder-name)
   "#new-folder-name-input" (ee/listen :keyup keyup>new-folder-name)
   "#create-folder-button" (ee/listen :click click>create-folder)
+  "#new-folder-form" (ee/listen :submit submit>new-folder-form)
   "#new-snippet-name-input" (ee/listen :change change>new-snippet-name)
   "#new-snippet-name-input" (ee/listen :keyup keyup>new-snippet-name)
   "input[name=target-mode]" (ee/listen :change change>input-target-mode)

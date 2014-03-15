@@ -197,6 +197,26 @@
   :location folder-header-location
   :handle-created folder-handle-created)
 
+(defn folder-mutation-allowed? [folder-eid {:keys [request]}]
+  (auth/user-eid-can-mutate-eid?
+   (:id (friend/current-authentication request))
+   folder-eid))
+
+(defn- params->folder [params]
+  params)
+
+(defn folder-put! [folder-eid ctx]
+  (let [folder (-> ctx :request :params params->folder)
+        safe-folder (assoc folder :id folder-eid)]
+    (data-folder/update-folder! safe-folder)))
+
+(defresource folder-resource [folder-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? (partial folder-mutation-allowed? folder-eid)
+  :put! (partial folder-put! folder-eid)
+  :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))
+
 (defroutes user-routes
 
   (GET "/" [] (projects-resource))
@@ -213,4 +233,6 @@
 
   (POST "/project/:project-eid/collection" [project-eid] (project-collection-resource (parse-long project-eid)))
 
-  (POST "/collection/:collection-eid/folder" [collection-eid] (collection-folder-resource (parse-long collection-eid))))
+  (POST "/collection/:collection-eid/folder" [collection-eid] (collection-folder-resource (parse-long collection-eid)))
+
+  (PUT "/folder/:folder-eid" [folder-eid] (folder-resource (parse-long folder-eid))))

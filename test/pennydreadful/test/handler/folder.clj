@@ -8,6 +8,7 @@
             [pennydreadful.data.user :as data-user]
             [pennydreadful.data.project :as data-project]
             [pennydreadful.data.collection :as data-coll]
+            [pennydreadful.data.folder :as data-folder]
             [pennydreadful.test.handler.login :as login]))
 
 (defn- make-post [body-content uri]
@@ -81,3 +82,96 @@
                             :collections
                             (find-where :name "condescending cougars manuscript"))]
      (post-new-to-collection {:name "CHAPTER 1"} coll-eid)))))
+
+;; PUT folder response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts manuscript")
+                              :children
+                              (find-where :name "aa folder A"))]
+     (-> (request :put (str "/folder/" folder-eid))
+         (body {:description "new description"})
+         app)))))
+
+;; PUT folder changes database
+(expect
+ {:name "aa folder A" :description "new description"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts manuscript")
+                              :children
+                              (find-where :name "aa folder A"))]
+     (-> (request :put (str "/folder/" folder-eid))
+         (body {:description "new description"})
+         app)
+     (data-folder/folder-by-eid folder-eid)))))
+
+;; Cannot PUT to someone else's folder
+(expect
+ {:status 403}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                              (find-where :name "condescending cougars")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "condescending cougars manuscript")
+                              :children
+                              (find-where :name "cc folder A"))]
+     (-> (request :put (str "/folder/" folder-eid))
+         (body {:name "malicious"})
+         app)))))
+
+(expect
+ {:name "cc folder A" :description "condescending cougars folder A"}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                              (find-where :name "condescending cougars")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "condescending cougars manuscript")
+                              :children
+                              (find-where :name "cc folder A"))]
+     (-> (request :put (str "/folder/" folder-eid))
+         (body {:name "malicious"})
+         app)
+     (data-folder/folder-by-eid folder-eid)))))
+
+;; PUT ignores :id in collection map, instead uses id in url
+(expect
+ {:name "aa folder A" :description "new description"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts manuscript")
+                              :children
+                              (find-where :name "aa folder A"))]
+     (-> (request :put (str "/folder/" folder-eid))
+         (body {:id 0 :description "new description"})
+         app)
+     (data-folder/folder-by-eid folder-eid)))))
+

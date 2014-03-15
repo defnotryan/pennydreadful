@@ -57,3 +57,37 @@
                               :children
                               (find-where :name "aa folder AB"))]
      (some #{folder-eid} (data-user/owned-eids ryan-eid)))))
+
+;; Update folders
+
+(expect
+ {:name "new folder name" :description "accidental astronauts folder A"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          folder (-> (data-project/projects-for-user-eid ryan-eid)
+                     (find-where :name "accidental astronauts")
+                     :id
+                     (data-project/project-by-eid {:depth :snippet-meta})
+                     :collections
+                     (find-where :name "accidental astronauts manuscript")
+                     :children
+                     (find-where :name "aa folder A"))]
+      (update-folder! (assoc folder :name "new folder name"))
+      (folder-by-eid (:id folder))))))
+
+(expect
+ {:name "aa folder A" :description "new description"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          folder (-> (data-project/projects-for-user-eid ryan-eid)
+                     (find-where :name "accidental astronauts")
+                     :id
+                     (data-project/project-by-eid {:depth :snippet-meta})
+                     :collections
+                     (find-where :name "accidental astronauts manuscript")
+                     :children
+                     (find-where :name "aa folder A"))]
+      (update-folder! (assoc folder :description "new description"))
+      (folder-by-eid (:id folder))))))

@@ -17,11 +17,11 @@
     :folder/word-count-mode (case (:word-count-mode folder)
                               :manual :folder.word-count-mode/manual
                               :automatic :folder.word-count-mode/automatic
-                              :folder.word-count-mode/off)
+                              nil)
     :folder/deadline-mode (case (:deadline-mode folder)
                             :manual :folder.deadline-mode/manual
                             :automatic :folder.deadline-mode/automatic
-                            :folder.deadline-mode/off)
+                            nil)
     :folder/deadline (some-> folder :deadline tc/to-date)}))
 
 (defn- hydrate [folder-entity]
@@ -49,6 +49,11 @@
         id (data/tempid->id result tempid)]
     (hydrate (d/entity (:db-after result) id))))
 
+(defn update-folder! [folder]
+  (let [folder-entity (dehydrate folder)
+        result @(d/transact @data/conn [folder-entity])]
+    (hydrate (d/entity (:db-after result) (:id folder)))))
+
 (declare folder-by-entity)
 
 (defn- get-child [child-eid depth]
@@ -61,6 +66,26 @@
   (let [child-eids (map :db/id (:folder/children ent))
         folder (hydrate ent)]
     (assoc folder :children (map #(get-child % depth) child-eids))))
+
+(defn- get-shallow [folder-eid]
+  (-> @data/conn
+      d/db
+      (d/entity folder-eid)
+      hydrate))
+
+(defn- get-with-children [folder-eid depth]
+  (let [folder-entity (-> @data/conn d/db (d/entity folder-eid))]
+    (folder-by-entity folder-entity depth)))
+
+(defn folder-by-eid
+  ([folder-eid]
+   (folder-by-eid folder-eid {:depth :folder}))
+  ([folder-eid {:keys [depth] :as opts}]
+   (case depth
+     :folder (get-shallow folder-eid)
+     :snippet-meta (get-with-children :snippet-meta)
+     :snippet (get-with-children :snippet)
+     (get-shallow folder-eid))))
 
 (defn owned-eids [folder-entity]
   (concat

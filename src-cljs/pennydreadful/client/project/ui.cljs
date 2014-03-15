@@ -45,6 +45,7 @@
   "#project-tree .pd-collection"
   [{collection-name :name collection-eid :id}]
   ".collection-name" (ef/content collection-name)
+  ".collection-name" (ef/html-content (ef/html [:a {:href (str "/collection/" collection-eid)} collection-name]))
   ".pd-collection" (ef/set-attr :id (str "collection-node-" collection-eid))
   "ul.fa-ul" (ef/content nil))
 

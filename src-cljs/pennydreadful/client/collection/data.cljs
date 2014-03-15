@@ -16,7 +16,7 @@
 (def created-folders (chan 1))
 (def create-folder-errors (chan 1))
 
-;; PUT collection description updates in collection-descriptions-to-update
+;; PUT collection metadata updates in collection-meta-to-update
 (go-forever
  (let [collection (<! collection-meta-to-update)]
    (swap! util/outstanding-request-count inc)
@@ -29,3 +29,17 @@
          :error-handler (fn [resp]
                           (go (>! update-collection-meta-errors resp)))
          :finally #(swap! util/outstanding-request-count dec)})))
+
+;; POST new folders in folders-to-create channel
+(go-forever
+ (let [[collection-eid folder] (<! folders-to-create)]
+   (swap! util/outstanding-request-count inc)
+   (POST (str "/collection/" collection-eid "/folder")
+         {:format :raw
+          :response-format :raw
+          :params folder
+          :handler (fn [new-folder-str]
+                     (go (>! created-folders (reader/read-string new-folder-str))))
+          :error-handler (fn [resp]
+                           (go (>! create-folder-errors resp)))
+          :finally #(swap! util/outstanding-request-count dec)})))

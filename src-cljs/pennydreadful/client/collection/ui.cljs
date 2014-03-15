@@ -102,6 +102,15 @@
 
 ;; DOM Manipulation
 
+(defsnippet folder-panel :compiled "src/pennydreadful/views/templates/collection.html"
+  "#children-list > *:first-child"
+  [{folder-title :name folder-description :description folder-eid :id}]
+  ".folder" (ef/set-attr :id (str "folder-panel-" folder-eid))
+  ".folder-title" (ef/do-> (ef/content folder-title) (ef/set-attr :data-id folder-eid))
+  ".folder-description" (ef/do-> (ef/content folder-description) (ef/set-attr :data-id folder-eid))
+  ".folder-move-up" (ef/set-attr :data-id folder-eid)
+  ".folder-move-down" (ef/set-attr :data-id folder-eid))
+
 (defaction show-changes-flag []
   "#changes-flag" (ef/remove-class "hide"))
 
@@ -226,6 +235,13 @@
 (defn keyup>new-folder-name [event]
   (reset! new-folder-name (-> event .-target .-value)))
 
+(defn click>create-folder [event]
+  (when @new-folder-name-valid?
+    (go (>! data/folders-to-create
+            [@collection-eid
+             {:name @new-folder-name
+              :description "Type here to add a description."}]))))
+
 (defn change>new-snippet-name [event]
   (reset! new-snippet-name (-> event .-target .-value)))
 
@@ -255,6 +271,7 @@
   "#collection-description" (ee/listen :input input>collection-description)
   "#new-folder-name-input" (ee/listen :change change>new-folder-name)
   "#new-folder-name-input" (ee/listen :keyup keyup>new-folder-name)
+  "#create-folder-button" (ee/listen :click click>create-folder)
   "#new-snippet-name-input" (ee/listen :change change>new-snippet-name)
   "#new-snippet-name-input" (ee/listen :keyup keyup>new-snippet-name)
   "input[name=target-mode]" (ee/listen :change change>input-target-mode)
@@ -339,3 +356,10 @@
  (let [response (<! data/update-collection-meta-errors)]
    (log response)))
 
+;; Handle folders created
+(go-forever
+ (let [{folder-eid :id :as folder} (<! data/created-folders)]
+   (ef/at
+    "#children-list" (ef/append (folder-panel folder))
+    "#new-folder-name-input" (ef/set-prop :value ""))
+   (reset! new-folder-name "")))

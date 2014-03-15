@@ -114,7 +114,7 @@
 (defsnippet new-folder-node :compiled "src/pennydreadful/views/templates/project.html"
   "#project-tree .pd-folder"
   [{folder-name :name folder-eid :id}]
-  ".folder-name" (ef/content folder-name)
+  ".folder-name" (ef/html-content (ef/html [:a {:href (str "/folder/" folder-eid)} folder-name]))
   ".pd-folder" (ef/set-attr :id (str "folder-node-" folder-eid))
   "ul.fa-ul" (ef/content nil))
 

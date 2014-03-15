@@ -111,6 +111,13 @@
   ".folder-move-up" (ef/set-attr :data-id folder-eid)
   ".folder-move-down" (ef/set-attr :data-id folder-eid))
 
+(defsnippet new-folder-node :compiled "src/pennydreadful/views/templates/project.html"
+  "#project-tree .pd-folder"
+  [{folder-name :name folder-eid :id}]
+  ".folder-name" (ef/content folder-name)
+  ".pd-folder" (ef/set-attr :id (str "folder-node-" folder-eid))
+  "ul.fa-ul" (ef/content nil))
+
 (defaction show-changes-flag []
   "#changes-flag" (ef/remove-class "hide"))
 
@@ -369,6 +376,7 @@
 (go-forever
  (let [{folder-eid :id :as folder} (<! data/created-folders)]
    (ef/at
+    (str "#collection-node-" @collection-eid " > ul.fa-ul") (ef/append (new-folder-node folder))
     "#children-list" (ef/append (folder-panel folder))
     "#new-folder-name-input" (ef/set-prop :value ""))
    (reset! new-folder-name "")))

@@ -53,7 +53,20 @@
         id (data/tempid->id result tempid)]
     (hydrate (d/entity (:db-after result) id))))
 
+(defn update-snippet! [snippet]
+  (let [snippet-entity (dehydrate snippet)
+        result @(d/transact @data/conn [snippet-entity])]
+    (hydrate (d/entity (:db-after result) (:id snippet)))))
+
 (defn snippet-by-entity [ent depth]
   (if (= depth :snippet-meta)
     (hydrate-lite ent)
     (hydrate ent)))
+
+(defn snippet-by-eid
+  ([snippet-eid]
+   (snippet-by-eid snippet-eid {:depth :snippet}))
+  ([snippet-eid {:keys [depth] :as opts}]
+   (case depth
+     :snippet-meta (-> @data/conn d/db (d/entity snippet-eid) hydrate-lite)
+     :snippet (-> @data/conn d/db (d/entity snippet-eid) hydrate))))

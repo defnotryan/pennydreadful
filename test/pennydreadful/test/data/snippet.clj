@@ -94,3 +94,37 @@
                                :children
                                (find-where :name "aa snippet BA1"))]
      (some #{snippet-eid} (data-user/owned-eids rhea-eid)))))
+
+;; Update snippets
+
+(expect
+ {:name "new snippet name" :description "accidental astronauts snippet 1"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          snippet (-> (data-project/projects-for-user-eid ryan-eid)
+                      (find-where :name "accidental astronauts")
+                      :id
+                      (data-project/project-by-eid {:depth :snippet-meta})
+                      :collections
+                      (find-where :name "accidental astronauts manuscript")
+                      :children
+                      (find-where :name "aa snippet 1"))]
+      (update-snippet! (assoc snippet :name "new snippet name"))
+      (snippet-by-eid (:id snippet))))))
+
+(expect
+ {:name "aa snippet 1" :description "new description"}
+ (in
+  (with-populated-db
+    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+          snippet (-> (data-project/projects-for-user-eid ryan-eid)
+                      (find-where :name "accidental astronauts")
+                      :id
+                      (data-project/project-by-eid {:depth :snippet-meta})
+                      :collections
+                      (find-where :name "accidental astronauts manuscript")
+                      :children
+                      (find-where :name "aa snippet 1"))]
+      (update-snippet! (assoc snippet :description "new description"))
+      (snippet-by-eid (:id snippet))))))

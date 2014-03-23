@@ -10,7 +10,7 @@
 
 ;; Insert folder into collection
 (expect
- {:name "chapter 1" :description "they become astronauts accidentally"}
+ {:name "chapter 1" :description "they become astronauts accidentally" :position 2}
  (in
   (with-populated-db
     (let [{ryan-eid :id} (data-user/user-for-username "ryan")

@@ -39,12 +39,13 @@
                      :folder.deadline-mode/manual :manual
                      :folder.deadline-mode/automatic :automatic
                      :off)
-    :deadline (some-> folder-entity :folder/deadline tc/from-date)}))
+    :deadline (some-> folder-entity :folder/deadline tc/from-date)
+    :position (:folder/position folder-entity)}))
 
 (defn insert-folder-into-collection! [collection-eid folder]
   (let [tempid (d/tempid :db.part/user)
         folder-entity (-> folder (assoc :id tempid) dehydrate)
-        facts [folder-entity {:db/id collection-eid :collection/children tempid}]
+        facts [folder-entity [:append-folder-position-in-collection collection-eid tempid] {:db/id collection-eid :collection/children tempid}]
         result @(d/transact @data/conn facts)
         id (data/tempid->id result tempid)]
     (hydrate (d/entity (:db-after result) id))))

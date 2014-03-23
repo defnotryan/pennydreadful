@@ -17,6 +17,22 @@
          (inc))]]}}
 
  {:db/id #db/id[:db.part/user]
+  :db/ident :append-folder-position-in-collection
+  :db/fn #db/fn
+  {:lang "clojure"
+   :params [db collection-eid folder-eid]
+   :code
+   [[:db/add
+     folder-eid
+     :folder/position
+     (->> collection-eid
+          (datomic.api/entity db)
+          :collection/children
+          (map #(or (:folder/position %) (:snippet/position %)))
+          (reduce max -1)
+          (inc))]]}}
+
+ {:db/id #db/id[:db.part/user]
   :db/ident :elide-collection-position
   :db/fn #db/fn
   {:lang "clojure"
@@ -42,6 +58,7 @@
   :db/ident :move-up-collection-position
   :db/fn #db/fn
   {:lang "clojure"
+   :requires [clojure.zip]
    :params [db collection-eid]
    :code
    (map-indexed

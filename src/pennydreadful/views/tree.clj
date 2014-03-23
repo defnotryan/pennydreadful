@@ -27,7 +27,7 @@
                   (if (= :folder entity-type)
                     (folder-node child current-eid)
                     (snippet-node child current-eid)))
-                folder-children)))
+                (sort-by :position folder-children))))
 
 (defsnippet collection-node template-path [:#project-tree :.pd-collection]
   [current-eid {collection-name :name collection-children :children collection-eid :id}]
@@ -43,7 +43,7 @@
                   (if (= :folder entity-type)
                     (folder-node child current-eid)
                     (snippet-node child current-eid)))
-                collection-children)))
+                (sort-by :position collection-children))))
 
 (defsnippet project-nav-tree template-path [:#project-nav]
   [{:keys [id name collections]} current-eid]

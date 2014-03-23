@@ -82,7 +82,7 @@
                         (if (= :folder entity-type)
                           (folder-panel child)
                           (snippet-panel child)))
-                      (:children collection))))
+                      (sort-by :position (:children collection)))))
 
 (defn render [context]
   (apply str (collection-page context)))

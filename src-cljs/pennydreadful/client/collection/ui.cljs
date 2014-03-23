@@ -111,12 +111,26 @@
   ".folder-move-up" (ef/set-attr :data-id folder-eid)
   ".folder-move-down" (ef/set-attr :data-id folder-eid))
 
+(defsnippet snippet-panel :compiled "src/pennydreadful/views/templates/collection.html"
+  "#children-list > *:last-child"
+  [{snippet-title :name snippet-description :description snippet-eid :id}]
+  ".snippet" (ef/set-attr :id (str "snippet-panel-" snippet-eid))
+  ".snippet-title" (ef/content snippet-title)
+  ".snippet-description" (ef/content snippet-description)
+  "*[data-id]" (ef/set-attr :data-id snippet-eid))
+
 (defsnippet new-folder-node :compiled "src/pennydreadful/views/templates/project.html"
   "#project-tree .pd-folder"
   [{folder-name :name folder-eid :id}]
   ".folder-name" (ef/html-content (ef/html [:a {:href (str "/folder/" folder-eid)} folder-name]))
   ".pd-folder" (ef/set-attr :id (str "folder-node-" folder-eid))
   "ul.fa-ul" (ef/content nil))
+
+(defsnippet new-snippet-node :compiled "src/pennydreadful/views/templates/project.html"
+  "#project-tree .pd-snippet"
+  [{snippet-name :name snippet-eid :id}]
+  ".snippet-name" (ef/html-content (ef/html [:a {:href (str "/snippet/" snippet-eid)} snippet-name]))
+  ".pd-snippet" (ef/set-attr :id (str "snippet-node-" snippet-eid)))
 
 (defaction show-changes-flag []
   "#changes-flag" (ef/remove-class "hide"))
@@ -234,6 +248,46 @@
           (swap! handlers assoc folder-eid (make-folder-description-input-handler folder-eid)))
         ((@handlers folder-eid) event)))))
 
+(defn make-snippet-title-input-handler [snippet-eid]
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/snippet-meta-to-update
+           {:id snippet-eid :name (prepare-content-string (-> event .-target .-textContent) "Untitled Snippet")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:snippet-title snippet-eid])
+     event)))
+
+(def input>snippet-title
+  (let [handlers (atom {})]
+    (fn [event]
+      (let [snippet-eid (extract-id (.-target event))]
+        (when-not (@handlers snippet-eid)
+          (swap! handlers assoc snippet-eid (make-snippet-title-input-handler snippet-eid)))
+        ((@handlers snippet-eid) event)))))
+
+(defn make-snippet-description-input-handler [snippet-eid]
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/snippet-meta-to-update
+           {:id snippet-eid :description (prepare-content-string (-> event .-target .-innerHTML) "Type here to add a description")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:snippet-description snippet-eid])
+     event)))
+
+(def input>snippet-description
+  (let [handlers (atom{})]
+    (fn [event]
+      (let [snippet-eid (extract-id (.-target event))]
+        (when-not (@handlers snippet-eid)
+          (swap! handlers assoc snippet-eid (make-snippet-description-input-handler snippet-eid)))
+        ((@handlers snippet-eid) event)))))
+
 (defn close-word-count-mode-dialog []
   (.foundation (js/$ "#edit-progress-dialog") "reveal" "close"))
 
@@ -303,6 +357,21 @@
 (defn keyup>new-snippet-name [event]
   (reset! new-snippet-name (-> event .-target .-value)))
 
+(defn click>create-snippet [event]
+  (when @new-snippet-name-valid?
+    (go (>! data/snippets-to-create
+            [@collection-eid
+             {:name @new-snippet-name
+              :description "Type here to add a description."}]))))
+
+(defn submit>new-snippet-form [event]
+  (.preventDefault event)
+  (when @new-snippet-name-valid?
+    (go (>! data/snippets-to-create
+            [@collection-eid
+             {:name @new-snippet-name
+              :description "Type here to add a description"}]))))
+
 (defn change>input-target-mode [event]
   (reset! progress-mode-selected-radio (-> event .-target)))
 
@@ -321,6 +390,8 @@
 (defaction setup-events []
   "body" (ee/listen-live :input ".folder-title" input>folder-title)
   "body" (ee/listen-live :input ".folder-description" input>folder-description)
+  "body" (ee/listen-live :input ".snippet-title" input>snippet-title)
+  "body" (ee/listen-live :input ".snippet-description" input>snippet-description)
   ".cancel-progress-dialog" (ee/listen :click click>cancel-progress-dialog)
   ".submit-progress-dialog" (ee/listen :click click>submit-progress-dialog)
   ".cancel-deadline-dialog" (ee/listen :click click>cancel-deadline-dialog)
@@ -332,6 +403,8 @@
   "#new-folder-form" (ee/listen :submit submit>new-folder-form)
   "#new-snippet-name-input" (ee/listen :change change>new-snippet-name)
   "#new-snippet-name-input" (ee/listen :keyup keyup>new-snippet-name)
+  "#create-snippet-button" (ee/listen :click click>create-snippet)
+  "#new-snippet-form" (ee/listen :submit submit>new-snippet-form)
   "input[name=target-mode]" (ee/listen :change change>input-target-mode)
   "#target-manual-value" (ee/listen :change change>target-manual-value)
   "#target-manual-value" (ee/listen :keyup keyup>target-manual-value)
@@ -434,12 +507,12 @@
        folder-eid (-> folder :id str)]
    (when-let [folder-name (:name folder)]
      (swap! unsaved-changes disj [:folder-title folder-eid])
-     (let [selector (str "#folder-panel-" folder-eid ". folder-title")
+     (let [selector (str "#folder-panel-" folder-eid " .folder-title")
            current-name (ef/from selector (ef/get-text))]
        (when-not (= folder-name current-name)
          (ef/at selector (ef/content folder-name)))
        (ef/at
-        (str "#folder-node-" folder-eid " .folder-name") (ef/content folder-name))))
+        (str "#folder-node-" folder-eid " > .folder-name") (ef/content folder-name))))
    (when-let [folder-description (:description folder)]
      (swap! unsaved-changes disj [:folder-description folder-eid])
      (let [selector (str "#folder-panel-" folder-eid " .folder-description")
@@ -450,4 +523,43 @@
 ;; Handle folder metadata update errors
 (go-forever
  (let [response (<! data/update-folder-meta-errors)]
+   (log response)))
+
+
+;; Handle snippets created
+(go-forever
+ (let [{snippet-eid :id :as snippet} (<! data/created-snippets)]
+   (ef/at
+    (str "#collection-node-" @collection-eid " > ul.fa-ul") (ef/append (new-snippet-node snippet))
+    "#children-list" (ef/append (snippet-panel snippet))
+    "#new-snippet-name-input" (ef/set-prop :value ""))
+   (reset! new-snippet-name "")))
+
+;; Handle snippet created errors
+(go-forever
+ (let [response (<! data/create-snippet-errors)]
+   (log response)))
+
+;; Handle snippet metadata updates
+(go-forever
+ (let [snippet (<! data/updated-snippet-meta)
+       snippet-eid (-> snippet :id str)]
+   (when-let [snippet-name (:name snippet)]
+     (swap! unsaved-changes disj [:snippet-title snippet-eid])
+     (let [selector (str "#snippet-panel-" snippet-eid " .snippet-title")
+           current-name (ef/from selector (ef/get-text))]
+       (when-not (= snippet-name current-name)
+         (ef/at selector (ef/content snippet-name)))
+       (ef/at
+        (str "#snippet-node-" snippet-eid " > .snippet-name") (ef/content snippet-name))))
+   (when-let [snippet-description (:description snippet)]
+     (swap! unsaved-changes disj [:snippet-description snippet-eid])
+     (let [selector (str "#snippet-panel-" snippet-eid " .snippet-description")
+           current-description (ef/from selector (ef/get-text))]
+       (when-not (= snippet-description current-description)
+         (ef/at selector (ef/html-content snippet-description)))))))
+
+;; Handle snippet metadata update errors
+(go-forever
+ (let [response (<! data/update-snippet-meta-errors)]
    (log response)))

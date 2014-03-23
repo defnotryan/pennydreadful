@@ -219,7 +219,7 @@
   :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))
 
 (defn snippet-post! [collection-eid {:keys [request] :as ctx}]
-  (let [snippet (:params request)
+  (let [snippet (-> request :params (assoc :content ""))
         inserted-snippet (data-snippet/insert-snippet-into-collection! collection-eid snippet)]
     {::snippet inserted-snippet}))
 

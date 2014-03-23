@@ -20,6 +20,14 @@
 (def updated-folder-meta (chan 3))
 (def update-folder-meta-errors (chan 3))
 
+(def snippets-to-create (chan 1))
+(def created-snippets (chan 1))
+(def create-snippet-errors (chan 1))
+
+(def snippet-meta-to-update (chan 3))
+(def updated-snippet-meta (chan 3))
+(def update-snippet-meta-errors (chan 3))
+
 ;; PUT collection metadata updates in collection-meta-to-update
 (go-forever
  (let [collection (<! collection-meta-to-update)]
@@ -57,5 +65,31 @@
          :response-format :raw
          :params folder
          :handler (fn [_] (go (>! updated-folder-meta folder)))
-         :error-handler (fn [resp] (go (>! update-folder-meta-errors)))
+         :error-handler (fn [resp] (go (>! update-folder-meta-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; POST new snippets in snippets-to-create channel
+(go-forever
+ (let [[collection-eid snippet] (<! snippets-to-create)]
+   (swap! util/outstanding-request-count inc)
+   (POST (str "/collection/" collection-eid "/snippet")
+         {:format :raw
+          :response-format :raw
+          :params snippet
+          :handler (fn [new-snippet-str]
+                     (go (>! created-snippets (reader/read-string new-snippet-str))))
+          :error-handler (fn [resp]
+                           (go (>! create-snippet-errors resp)))
+          :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT snippet metadata updates in snippet-meta-to-update
+(go-forever
+ (let [{snippet-eid :id :as snippet} (<! snippet-meta-to-update)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/snippet/" snippet-eid)
+        {:format :raw
+         :response-format :raw
+         :params snippet
+         :handler (fn [_] (go (>! updated-snippet-meta snippet)))
+         :error-handler (fn [resp] (go (>! update-snippet-meta-errors resp)))
          :finally #(swap! util/outstanding-request-count dec)})))

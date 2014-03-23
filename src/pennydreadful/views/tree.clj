@@ -11,7 +11,7 @@
                                 ""))
   [:.snippet-name :a] (do-> (content snippet-name)
                             (set-attr :href (str "/snippet/" snippet-eid)))
-  [:pd-snippet] (set-attr :id (str "snippet-node-" snippet-eid)))
+  [:.pd-snippet] (set-attr :id (str "snippet-node-" snippet-eid)))
 
 (defsnippet folder-node template-path [:#project-tree :.pd-folder]
   [{folder-name :name folder-children :children folder-eid :id} current-eid]

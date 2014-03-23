@@ -188,13 +188,15 @@
   :db/ident :folder/deadline
   :db/valueType :db.type/instant
   :db/cardinality :db.cardinality/one
-  :db/doc "Folder's deadline when :folder/deadline-mode is set to :folder.deadline/manual"}
+  :db/doc "Folder's deadline when :folder/deadline-mode is set to :folder.deadline/manual"
+  :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
   :db/ident :folder/position
   :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one
-  :db/doc "The position of the folder among its sibling folders and snippets"}
+  :db/doc "The position of the folder among its sibling folders and snippets"
+  :db.install/_attribute :db.part/db}
 
  {:db/id #db/id[:db.part/db]
   :db/ident :folder/children

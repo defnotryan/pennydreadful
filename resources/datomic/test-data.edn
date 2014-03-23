@@ -116,84 +116,99 @@
   :folder/description "accidental astronauts folder A"
   :folder/word-count-mode :folder.word-count-mode/manual
   :folder/target 2000
+  :folder/position 0
   :folder/children [#db/id[:db.part/user -5000001] #db/id[:db.part/user -4000002]]}
 
  {:db/id #db/id[:db.part/user -4000002]
   :folder/name "aa folder AB"
+  :folder/position 0
   :folder/description "accidental astronauts folder AB"
   :folder/target 2000}
 
  {:db/id #db/id[:db.part/user -4000003]
   :folder/name "aa folder B"
   :folder/description "accidental astronauts folder B"
+  :folder/position 0
   :folder/word-count-mode :folder.word-count-mode/off
   :folder/children [#db/id[:db.part/user -4000004] #db/id[:db.part/user -4000005]]}
 
  {:db/id #db/id[:db.part/user -4000004]
   :folder/name "aa folder BA"
   :folder/description "accidental astronauts folder BA"
+  :folder/position 0
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -5000003] #db/id[:db.part/user -5000004]]}
 
  {:db/id #db/id[:db.part/user -4000005]
   :folder/name "aa folder BB"
   :folder/description "accidental astronauts folder BB"
+  :folder/position 1
   :folder/target 2000}
 
  {:db/id #db/id[:db.part/user -4000006]
   :folder/name "bb folder A"
   :folder/description "bromantic birdfeeders folder A"
   :folder/target 2000
+  :folder/position 0
   :folder/children [#db/id[:db.part/user -5000005] #db/id[:db.part/user -4000007]]}
 
  {:db/id #db/id[:db.part/user -4000007]
   :folder/name "bb folder AB"
   :folder/description "bromantic birdfeeders folder AB"
+  :folder/position 0
   :folder/target 2000}
 
  {:db/id #db/id[:db.part/user -4000008]
   :folder/name "bb folder B"
   :folder/description "bromantic birdfeeders folder B"
+  :folder/position 0
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -4000009] #db/id[:db.part/user -4000010]]}
 
  {:db/id #db/id[:db.part/user -4000009]
   :folder/name "bb folder BA"
   :folder/description "bromantic birdfeeders folder BA"
+  :folder/position 0
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -5000007] #db/id[:db.part/user -5000008]]}
 
  {:db/id #db/id[:db.part/user -4000010]
   :folder/name "bb folder BB"
   :folder/description "bromantic birdfeeders folder BB"
+  :folder/position 1
   :folder/target 2000}
 
  {:db/id #db/id[:db.part/user -4000011]
   :folder/name "cc folder A"
   :folder/description "condescending cougars folder A"
   :folder/target 2000
+  :folder/position 0
   :folder/children [#db/id[:db.part/user -5000009] #db/id[:db.part/user -4000012]]}
 
  {:db/id #db/id[:db.part/user -4000012]
   :folder/name "cc folder AB"
   :folder/description "condescending cougars folder AB"
+  :folder/position 0
   :folder/target 2000}
 
  {:db/id #db/id[:db.part/user -4000013]
   :folder/name "cc folder B"
   :folder/description "condescending cougars folder B"
+  :folder/position 0
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -4000014] #db/id[:db.part/user -4000015]]}
 
  {:db/id #db/id[:db.part/user -4000014]
   :folder/name "cc folder BA"
   :folder/description "condescending cougars folder BA"
+  :folder/position 0
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -5000011] #db/id[:db.part/user -5000012]]}
 
  {:db/id #db/id[:db.part/user -4000015]
   :folder/name "cc folder BB"
   :folder/description "condescending cougars folder BB"
+  :folder/position 1
   :folder/target 2000}
 
  {:db/id #db/id[:db.part/user -4000016]
@@ -201,10 +216,12 @@
   :folder/description "dwindling dandies folder A"
   :folder/word-count-mode :folder.word-count-mode/automatic
   :folder/deadline-mode :folder.deadline-mode/automatic
+  :folder/position 0
   :folder/children [#db/id[:db.part/user -5000013] #db/id[:db.part/user -4000017]]}
 
  {:db/id #db/id[:db.part/user -4000017]
   :folder/name "dd folder AB"
+  :folder/position 0
   :folder/word-count-mode :folder.word-count-mode/automatic
   :folder/deadline-mode :folder.deadline-mode/automatic
   :folder/description "dwindling dandies folder AB"
@@ -213,18 +230,21 @@
  {:db/id #db/id[:db.part/user -4000018]
   :folder/name "dd folder B"
   :folder/description "dwindling dandies folder B"
+  :folder/position 0
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -4000019] #db/id[:db.part/user -4000020]]}
 
  {:db/id #db/id[:db.part/user -4000019]
   :folder/name "dd folder BA"
   :folder/description "dwindling dandies folder BA"
+  :folder/position 0
   :folder/target 2000
   :folder/children [#db/id[:db.part/user -5000015] #db/id[:db.part/user -5000016]]}
 
  {:db/id #db/id[:db.part/user -4000020]
   :folder/name "dd folder BB"
   :folder/description "dwindling dandies folder BB"
+  :folder/position 1
   :folder/target 2000}
 
 
@@ -233,6 +253,7 @@
  {:db/id #db/id[:db.part/user -5000001]
   :snippet/name "aa snippet A1"
   :snippet/description "accidental astronauts snippet A1"
+  :snippet/position 1
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -240,6 +261,7 @@
  {:db/id #db/id[:db.part/user -5000002]
   :snippet/name "aa snippet 1"
   :snippet/description "accidental astronauts snippet 1"
+  :snippet/position 1
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -247,6 +269,7 @@
  {:db/id #db/id[:db.part/user -5000003]
   :snippet/name "aa snippet BA1"
   :snippet/description "accidental astronauts snippet BA1"
+  :snippet/position 0
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -254,6 +277,7 @@
  {:db/id #db/id[:db.part/user -5000004]
   :snippet/name "aa snippet BA2"
   :snippet/description "accidental astronauts snippet BA2"
+  :snippet/position 1
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -261,6 +285,7 @@
  {:db/id #db/id[:db.part/user -5000005]
   :snippet/name "bb snippet A1"
   :snippet/description "bromantic birdfeeders snippet A1"
+  :snippet/position 1
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -268,6 +293,7 @@
  {:db/id #db/id[:db.part/user -5000006]
   :snippet/name "bb snippet 1"
   :snippet/description "bromantic birdfeeders snippet 1"
+  :snippet/position 1
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -275,6 +301,7 @@
  {:db/id #db/id[:db.part/user -5000007]
   :snippet/name "bb snippet BA1"
   :snippet/description "bromantic birdfeeders snippet BA1"
+  :snippet/position 0
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -283,6 +310,7 @@
   :snippet/name "bb snippet BA2"
   :snippet/description "bromantic birdfeeders snippet BA2"
   :snippet/content "content here"
+  :snippet/position 1
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
 
@@ -290,12 +318,14 @@
   :snippet/name "cc snippet A1"
   :snippet/description "condescending cougars snippet A1"
   :snippet/content "content here"
+  :snippet/position 1
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
 
  {:db/id #db/id[:db.part/user -5000010]
   :snippet/name "cc snippet 1"
   :snippet/description "condescending cougars snippet 1"
+  :snippet/position 1
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -303,6 +333,7 @@
  {:db/id #db/id[:db.part/user -5000011]
   :snippet/name "cc snippet BA1"
   :snippet/description "condescending cougars snippet BA1"
+  :snippet/position 0
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -311,12 +342,14 @@
   :snippet/name "cc snippet BA2"
   :snippet/description "condescending cougars snippet BA2"
   :snippet/content "content here"
+  :snippet/position 1
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
 
  {:db/id #db/id[:db.part/user -5000013]
   :snippet/name "dd snippet A1"
   :snippet/description "dwindling dandies snippet A1"
+  :snippet/position 1
   :snippet/word-count-mode :snippet.word-count-mode/manual
   :snippet/target 2000
   :snippet/content "content here"
@@ -328,6 +361,7 @@
  {:db/id #db/id[:db.part/user -5000014]
   :snippet/name "dd snippet 1"
   :snippet/description "dwindling dandies snippet 1"
+  :snippet/position 1
   :snippet/content "content here"
   :snippet/word-count-mode :snippet.word-count-mode/manual
   :snippet/target 1000
@@ -339,6 +373,7 @@
  {:db/id #db/id[:db.part/user -5000015]
   :snippet/name "dd snippet BA1"
   :snippet/description "dwindling dandies snippet BA1"
+  :snippet/position 0
   :snippet/content "content here"
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
@@ -347,6 +382,7 @@
   :snippet/name "dd snippet BA2"
   :snippet/description "dwindling dandies snippet BA2"
   :snippet/content "content here"
+  :snippet/position 1
   :snippet/create-date #inst "2013-12-29T00:00:00.000-00:00"
   :snippet/last-edit-date #inst "2013-12-30T00:00:00.000-00:00"}
 

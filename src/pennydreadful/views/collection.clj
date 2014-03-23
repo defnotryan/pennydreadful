@@ -19,13 +19,15 @@
   [{folder-title :name folder-description :description folder-eid :id}]
   [:.folder] (set-attr :id (str "folder-panel-" folder-eid))
   [:.folder-title] (content folder-title)
-  [:.folder-description] (content folder-description))
+  [:.folder-description] (content folder-description)
+  [(attr? :data-id)] (set-attr :data-id folder-eid))
 
 (defsnippet snippet-panel template-path [:#children-list :> :.snippet]
   [{snippet-title :name snippet-description :description snippet-eid :id}]
   [:.snippet] (set-attr :id (str "snippet-panel-" snippet-eid))
   [:.snippet-title] (content snippet-title)
-  [:.snippet-description] (content snippet-description))
+  [:.snippet-description] (content snippet-description)
+  [(attr? :data-id)] (set-attr :data-id snippet-eid))
 
 (deftemplate collection-page template-path [{:keys [collection project username] :as context}]
 

@@ -6,7 +6,7 @@
             [tailrecursion.javelin]
             [pennydreadful.client.main :as main]
             [pennydreadful.client.collection.data :as data]
-            [pennydreadful.client.util :refer [log debounce default-string extract-id debouce move-node-up move-node-down format]])
+            [pennydreadful.client.util :refer [log debounce default-string extract-id move-node-up move-node-down format]])
   (:require-macros [enfocus.macros :refer [defaction defsnippet]]
                    [pennydreadful.client.util-macros :refer [go-forever]]
                    [tailrecursion.javelin :refer [defc defc= cell=]]
@@ -190,6 +190,50 @@
 
 ;; Events
 
+(defn prepare-content-string [s default]
+  (let [default-trim (fnil string/trim "")]
+    (-> s default-trim (default-string default))))
+
+(defn make-folder-title-input-handler [folder-eid]
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/folder-meta-to-update
+           {:id folder-eid :name (prepare-content-string (-> event .-target .-textContent) "Untitled Folder")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:folder-title folder-eid])
+     event)))
+
+(def input>folder-title
+  (let [handlers (atom {})]
+    (fn [event]
+      (let [folder-eid (extract-id (.-target event))]
+        (when-not (@handlers folder-eid)
+          (swap! handlers assoc folder-eid (make-folder-title-input-handler folder-eid)))
+        ((@handlers folder-eid) event)))))
+
+(defn make-folder-description-input-handler [folder-eid]
+  (comp
+   (debounce
+    (fn [event]
+      (go
+       (>! data/folder-meta-to-update
+           {:id folder-eid :description (prepare-content-string (-> event .-target .-innerHTML) "Type here to add a description")})))
+    3000)
+   (fn [event]
+     (swap! unsaved-changes conj [:folder-description folder-eid])
+     event)))
+
+(def input>folder-description
+  (let [handlers (atom {})]
+    (fn [event]
+      (let [folder-eid (extract-id (.-target event))]
+        (when-not (@handlers folder-eid)
+          (swap! handlers assoc folder-eid (make-folder-description-input-handler folder-eid)))
+        ((@handlers folder-eid) event)))))
+
 (defn close-word-count-mode-dialog []
   (.foundation (js/$ "#edit-progress-dialog") "reveal" "close"))
 
@@ -219,10 +263,6 @@
 
 (defn click>cancel-deadline-dialog [event]
   (close-deadline-mode-dialog))
-
-(defn prepare-content-string [s default]
-  (let [default-trim (fnil string/trim "")]
-    (-> s default-trim (default-string default))))
 
 (def input>collection-description
   (comp
@@ -279,6 +319,8 @@
   (reset! new-deadline-raw (-> event .-target .-value)))
 
 (defaction setup-events []
+  "body" (ee/listen-live :input ".folder-title" input>folder-title)
+  "body" (ee/listen-live :input ".folder-description" input>folder-description)
   ".cancel-progress-dialog" (ee/listen :click click>cancel-progress-dialog)
   ".submit-progress-dialog" (ee/listen :click click>submit-progress-dialog)
   ".cancel-deadline-dialog" (ee/listen :click click>cancel-deadline-dialog)
@@ -380,3 +422,32 @@
     "#children-list" (ef/append (folder-panel folder))
     "#new-folder-name-input" (ef/set-prop :value ""))
    (reset! new-folder-name "")))
+
+;; Handle folder created errors
+(go-forever
+ (let [response (<! data/create-folder-errors)]
+   (log response)))
+
+;; Handle folder metadata updates
+(go-forever
+ (let [folder (<! data/updated-folder-meta)
+       folder-eid (-> folder :id str)]
+   (when-let [folder-name (:name folder)]
+     (swap! unsaved-changes disj [:folder-title folder-eid])
+     (let [selector (str "#folder-panel-" folder-eid ". folder-title")
+           current-name (ef/from selector (ef/get-text))]
+       (when-not (= folder-name current-name)
+         (ef/at selector (ef/content folder-name)))
+       (ef/at
+        (str "#folder-node-" folder-eid " .folder-name") (ef/content folder-name))))
+   (when-let [folder-description (:description folder)]
+     (swap! unsaved-changes disj [:folder-description folder-eid])
+     (let [selector (str "#folder-panel-" folder-eid " .folder-description")
+           current-description (ef/from selector (ef/get-text))]
+       (when-not (= folder-description current-description)
+         (ef/at selector (ef/html-content folder-description)))))))
+
+;; Handle folder metadata update errors
+(go-forever
+ (let [response (<! data/update-folder-meta-errors)]
+   (log response)))

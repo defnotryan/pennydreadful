@@ -16,6 +16,10 @@
 (def created-folders (chan 1))
 (def create-folder-errors (chan 1))
 
+(def folder-meta-to-update (chan 3))
+(def updated-folder-meta (chan 3))
+(def update-folder-meta-errors (chan 3))
+
 ;; PUT collection metadata updates in collection-meta-to-update
 (go-forever
  (let [collection (<! collection-meta-to-update)]
@@ -43,3 +47,15 @@
           :error-handler (fn [resp]
                            (go (>! create-folder-errors resp)))
           :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT folder metadata updates in folder-meta-to-update
+(go-forever
+ (let [{folder-eid :id :as folder} (<! folder-meta-to-update)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/folder/" folder-eid)
+        {:format :raw
+         :response-format :raw
+         :params folder
+         :handler (fn [_] (go (>! updated-folder-meta folder)))
+         :error-handler (fn [resp] (go (>! update-folder-meta-errors)))
+         :finally #(swap! util/outstanding-request-count dec)})))

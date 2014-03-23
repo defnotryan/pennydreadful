@@ -10,6 +10,7 @@
             [pennydreadful.data.collection :as data-coll]
             [pennydreadful.data.project :as data-project]
             [pennydreadful.data.folder :as data-folder]
+            [pennydreadful.data.snippet :as data-snippet]
             [pennydreadful.views.projects :as projects-view]
             [pennydreadful.views.project :as project-view]
             [pennydreadful.views.collection :as collection-view]))
@@ -217,6 +218,46 @@
   :put! (partial folder-put! folder-eid)
   :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))
 
+(defn snippet-post! [collection-eid {:keys [request] :as ctx}]
+  (let [snippet (:params request)
+        inserted-snippet (data-snippet/insert-snippet-into-collection! collection-eid snippet)]
+    {::snippet inserted-snippet}))
+
+(defn snippet-header-location [{:keys [request] :as ctx}]
+  (when (#{:post} (:request-method request))
+    (str "/snippet/" (get-in ctx [::snippet :id]))))
+
+(defn snippet-handle-created [ctx]
+  (pr-str (::snippet ctx)))
+
+(defresource collection-snippet-resource [collection-eid]
+  :allowed-methods [:post]
+  :available-media-types ["text/html"]
+  :authorized? (partial collection-mutation-allowed? collection-eid)
+  :post! (partial snippet-post! collection-eid)
+  :location snippet-header-location
+  :handle-created snippet-handle-created)
+
+(defn snippet-mutation-allowed? [snippet-eid {:keys [request]}]
+  (auth/user-eid-can-mutate-eid?
+   (:id (friend/current-authentication request))
+   snippet-eid))
+
+(defn- params->snippet [params]
+  params)
+
+(defn snippet-put! [snippet-eid ctx]
+  (let [snippet (-> ctx :request :params params->snippet)
+        safe-snippet (assoc snippet :id snippet-eid)]
+    (data-snippet/update-snippet! safe-snippet)))
+
+(defresource snippet-resource [snippet-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? (partial snippet-mutation-allowed? snippet-eid)
+  :put! (partial snippet-put! snippet-eid)
+  :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))
+
 (defroutes user-routes
 
   (GET "/" [] (projects-resource))
@@ -235,4 +276,8 @@
 
   (POST "/collection/:collection-eid/folder" [collection-eid] (collection-folder-resource (parse-long collection-eid)))
 
-  (PUT "/folder/:folder-eid" [folder-eid] (folder-resource (parse-long folder-eid))))
+  (POST "/collection/:collection-eid/snippet" [collection-eid] (collection-snippet-resource (parse-long collection-eid)))
+
+  (PUT "/folder/:folder-eid" [folder-eid] (folder-resource (parse-long folder-eid)))
+
+  (PUT "/snippet/:snippet-eid" [snippet-eid] (snippet-resource (parse-long snippet-eid))))

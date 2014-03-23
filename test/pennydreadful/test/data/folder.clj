@@ -43,6 +43,21 @@
      (some #{folder-eid} (data-user/owned-eids ryan-eid)))))
 
 (expect
+ not ;; expect falsey
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {rhea-eid :id} (data-user/user-for-username "rhea")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts manuscript")
+                              :children
+                              (find-where :name "aa folder A"))]
+     (some #{folder-eid} (data-user/owned-eids rhea-eid)))))
+
+(expect
  identity ;; expect truthy
  (with-populated-db
    (let [{ryan-eid :id} (data-user/user-for-username "ryan")
@@ -57,6 +72,23 @@
                               :children
                               (find-where :name "aa folder AB"))]
      (some #{folder-eid} (data-user/owned-eids ryan-eid)))))
+
+(expect
+ not ;; expect falsey
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {rhea-eid :id} (data-user/user-for-username "rhea")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts manuscript")
+                              :children
+                              (find-where :name "aa folder A")
+                              :children
+                              (find-where :name "aa folder AB"))]
+     (some #{folder-eid} (data-user/owned-eids rhea-eid)))))
 
 ;; Update folders
 

@@ -16,10 +16,10 @@
     :snippet/deadline (some-> snippet :deadline tc/to-date)
     :snippet/word-count-mode (case (:word-count-mode snippet)
                                :manual :snippet.word-count-mode/manual
-                               :snippet.word-count-mode/off)
+                               nil)
     :snippet/deadline-mode (case (:deadline-mode snippet)
                              :manual :snippet.deadline-mode/manual
-                             :snippet.deadline-mode/off)}))
+                             nil)}))
 
 (defn- hydrate [snippet-entity]
   (denil
@@ -44,6 +44,14 @@
    {:id (:db/id snippet-entity)
     :name (:snippet/name snippet-entity)
     :description (:snippet/description snippet-entity)}))
+
+(defn insert-snippet-into-collection! [collection-eid snippet]
+  (let [tempid (d/tempid :db.part/user)
+        snippet-entity (-> snippet (assoc :id tempid) dehydrate)
+        facts [snippet-entity {:db/id collection-eid :collection/children tempid}]
+        result @(d/transact @data/conn facts)
+        id (data/tempid->id result tempid)]
+    (hydrate (d/entity (:db-after result) id))))
 
 (defn snippet-by-entity [ent depth]
   (if (= depth :snippet-meta)

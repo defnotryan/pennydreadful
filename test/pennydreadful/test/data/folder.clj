@@ -150,7 +150,7 @@
             (map :name))))))
 
 ;; Move folder down
-#_(expect
+(expect
  ["aa folder C" "aa folder B"]
  (with-populated-db
    (let [{ryan-eid :id} (data-user/user-for-username "ryan")

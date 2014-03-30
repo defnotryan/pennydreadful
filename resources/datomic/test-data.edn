@@ -53,7 +53,7 @@
   :collection/word-count-mode :collection.word-count-mode/off
   :collection/deadline-mode :collection.deadline-mode/off
   :collection/position 1
-  :collection/children [#db/id[:db.part/user -4000003]]}
+  :collection/children [#db/id[:db.part/user -4000003] #db/id[:db.part/user -4000103]]}
 
  {:db/id #db/id[:db.part/user -3000003]
   :collection/name "bromantic birdfeeders manuscript"
@@ -131,6 +131,13 @@
   :folder/position 0
   :folder/word-count-mode :folder.word-count-mode/off
   :folder/children [#db/id[:db.part/user -4000004] #db/id[:db.part/user -4000005]]}
+
+ {:db/id #db/id[:db.part/user -4000103]
+  :folder/name "aa folder C"
+  :folder/position 1
+  :folder/word-count-mode :folder.word-count-mode/off
+  :folder/deadline-mode :folder.deadline-mode/off
+  :folder/children []}
 
  {:db/id #db/id[:db.part/user -4000004]
   :folder/name "aa folder BA"

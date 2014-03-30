@@ -88,6 +88,9 @@
      :snippet (get-with-children :snippet)
      (get-shallow folder-eid))))
 
+(defn move-up! [folder-eid]
+  @(d/transact @data/conn [[:move-up-folder-position folder-eid]]))
+
 (defn owned-eids [folder-entity]
   (concat
    (map :db/id (:folder/children folder-entity))

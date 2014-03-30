@@ -123,3 +123,53 @@
                      (find-where :name "aa folder A"))]
       (update-folder! (assoc folder :description "new description"))
       (folder-by-eid (:id folder))))))
+
+;; Move folder up
+(expect
+ ["aa folder C" "aa folder B"]
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts research")
+                              :children
+                              (find-where :name "aa folder C"))]
+     (move-up! folder-eid)
+     (let [children (-> (data-project/projects-for-user-eid ryan-eid)
+                        (find-where :name "accidental astronauts")
+                        :id
+                        (data-project/project-by-eid {:depth :snippet-meta})
+                        :collections
+                        (find-where :name "accidental astronauts research")
+                        :children)]
+       (->> children
+            (sort-by :position)
+            (map :name))))))
+
+;; Move folder down
+#_(expect
+ ["aa folder C" "aa folder B"]
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts research")
+                              :children
+                              (find-where :name "aa folder B"))]
+     (move-down! folder-eid)
+     (let [children (-> (data-project/projects-for-user-eid ryan-eid)
+                        (find-where :name "accidental astronauts")
+                        :id
+                        (data-project/project-by-eid {:depth :snippet-meta})
+                        :collections
+                        (find-where :name "accidental astronauts research")
+                        :children)]
+       (->> children
+            (sort-by :position)
+            (map :name))))))

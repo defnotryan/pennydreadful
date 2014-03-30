@@ -11,7 +11,7 @@
 
 ;; Insert snippet into pennydreadful.data.collection
 (expect
- {:name "scene 1" :description "a fell wind blows"}
+ {:name "scene 1" :description "a fell wind blows" :position 2}
  (in
   (with-populated-db
     (let [{ryan-eid :id} (data-user/user-for-username "ryan")

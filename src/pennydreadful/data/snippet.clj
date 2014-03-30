@@ -27,6 +27,7 @@
     :entity :snippet
     :name (:snippet/name snippet-entity)
     :description (:snippet/description snippet-entity)
+    :position (:snippet/position snippet-entity)
     :content (:snippet/content snippet-entity)
     :create-date (:snippet/create-date snippet-entity)
     :last-edit-date (:snippet/last-edit-date snippet-entity)
@@ -43,12 +44,13 @@
   (denil
    {:id (:db/id snippet-entity)
     :name (:snippet/name snippet-entity)
-    :description (:snippet/description snippet-entity)}))
+    :description (:snippet/description snippet-entity)
+    :position (:snippet/position snippet-entity)}))
 
 (defn insert-snippet-into-collection! [collection-eid snippet]
   (let [tempid (d/tempid :db.part/user)
         snippet-entity (-> snippet (assoc :id tempid) dehydrate)
-        facts [snippet-entity {:db/id collection-eid :collection/children tempid}]
+        facts [snippet-entity [:append-snippet-position-in-collection collection-eid tempid] {:db/id collection-eid :collection/children tempid}]
         result @(d/transact @data/conn facts)
         id (data/tempid->id result tempid)]
     (hydrate (d/entity (:db-after result) id))))

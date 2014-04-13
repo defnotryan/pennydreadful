@@ -175,3 +175,136 @@
          app)
      (data-folder/folder-by-eid folder-eid)))))
 
+;; PUT /folder/:folder-eid/move-up response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts research")
+                              :children
+                              (find-where :name "aa folder B")
+                              :children
+                              (find-where :name "aa folder BB"))]
+     (-> (request :put (str "/folder/" folder-eid "/move-up"))
+         app)))))
+
+;; PUT /folder/:folder-eid/move-down response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts research")
+                              :children
+                              (find-where :name "aa folder B")
+                              :children
+                              (find-where :name "aa folder BA"))]
+     (-> (request :put (str "/folder/" folder-eid "/move-down"))
+         app)))))
+
+;; Can't move-up someone else's folder
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                              (find-where :name "condescending cougars")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "condescending cougars research")
+                              :children
+                              (find-where :name "cc folder B")
+                              :children
+                              (find-where :name "cc folder BB"))]
+     (-> (request :put (str "/folder/" folder-eid "/move-up"))
+         app)))))
+
+;; Can't move-down someone else's folder
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                              (find-where :name "condescending cougars")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "condescending cougars research")
+                              :children
+                              (find-where :name "cc folder B")
+                              :children
+                              (find-where :name "cc folder BA"))]
+     (-> (request :put (str "/folder/" folder-eid "/move-down"))
+         app)))))
+
+;; PUT to /folder/:folder-eid/move-up mutates database correctly
+(expect
+ {:name "aa folder BB"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts research")
+                              :children
+                              (find-where :name "aa folder B")
+                              :children
+                              (find-where :name "aa folder BB"))]
+     (-> (request :put (str "/folder/" folder-eid "/move-up"))
+         app)
+     (-> (data-project/projects-for-user-eid ryan-eid)
+         (find-where :name "accidental astronauts")
+         :id
+         (data-project/project-by-eid {:depth :snippet-meta})
+         :collections
+         (find-where :name "accidental astronauts research")
+         :children
+         (find-where :name "aa folder B")
+         :children
+         (find-where :position 0))))))
+
+;; PUT to /folder/:folder-eid/move-down mutates database correctly
+(expect
+ {:name "aa folder BB"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {folder-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                              (find-where :name "accidental astronauts")
+                              :id
+                              (data-project/project-by-eid {:depth :snippet-meta})
+                              :collections
+                              (find-where :name "accidental astronauts research")
+                              :children
+                              (find-where :name "aa folder B")
+                              :children
+                              (find-where :name "aa folder BA"))]
+     (-> (request :put (str "/folder/" folder-eid "/move-down"))
+         app)
+     (-> (data-project/projects-for-user-eid ryan-eid)
+         (find-where :name "accidental astronauts")
+         :id
+         (data-project/project-by-eid {:depth :snippet-meta})
+         :collections
+         (find-where :name "accidental astronauts research")
+         :children
+         (find-where :name "aa folder B")
+         :children
+         (find-where :position 0))))))

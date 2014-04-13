@@ -218,6 +218,28 @@
   :put! (partial folder-put! folder-eid)
   :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))
 
+(defn folder-move-up! [folder-eid _]
+  (data-folder/move-up! folder-eid)
+  {::folder (data-folder/folder-by-eid folder-eid)})
+
+(defresource folder-move-up [folder-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? (partial folder-mutation-allowed? folder-eid)
+  :put! (partial folder-move-up! folder-eid)
+  :handle-created folder-handle-created)
+
+(defn folder-move-down! [folder-eid _]
+  (data-folder/move-down! folder-eid)
+  {::folder (data-folder/folder-by-eid folder-eid)})
+
+(defresource folder-move-down [folder-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? (partial folder-mutation-allowed? folder-eid)
+  :put! (partial folder-move-down! folder-eid)
+  :handle-created folder-handle-created)
+
 (defn snippet-post! [collection-eid {:keys [request] :as ctx}]
   (let [snippet (-> request :params (assoc :content ""))
         inserted-snippet (data-snippet/insert-snippet-into-collection! collection-eid snippet)]
@@ -279,5 +301,9 @@
   (POST "/collection/:collection-eid/snippet" [collection-eid] (collection-snippet-resource (parse-long collection-eid)))
 
   (PUT "/folder/:folder-eid" [folder-eid] (folder-resource (parse-long folder-eid)))
+
+  (PUT "/folder/:folder-eid/move-up" [folder-eid] (folder-move-up (parse-long folder-eid)))
+
+  (PUT "/folder/:folder-eid/move-down" [folder-eid] (folder-move-down (parse-long folder-eid)))
 
   (PUT "/snippet/:snippet-eid" [snippet-eid] (snippet-resource (parse-long snippet-eid))))

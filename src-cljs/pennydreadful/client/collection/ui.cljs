@@ -403,6 +403,16 @@
    (let [folder-eid (extract-id (.-target event))]
      (>! data/folder-eids-to-move-down folder-eid))))
 
+(defn click>snippet-move-up [event]
+  (go
+   (let [snippet-eid (extract-id (.-target event))]
+     (>! data/snippet-eids-to-move-up snippet-eid))))
+
+(defn click>snippet-move-down [event]
+  (go
+   (let [snippet-eid (extract-id (.-target event))]
+     (>! data/snippet-eids-to-move-down snippet-eid))))
+
 (defaction setup-events []
   "body" (ee/listen-live :input ".folder-title" input>folder-title)
   "body" (ee/listen-live :input ".folder-description" input>folder-description)
@@ -410,6 +420,8 @@
   "body" (ee/listen-live :input ".snippet-description" input>snippet-description)
   "body" (ee/listen-live :click ".folder .child-move-up:not(.disabled)" click>folder-move-up)
   "body" (ee/listen-live :click ".folder .child-move-down:not(.disabled)" click>folder-move-down)
+  "body" (ee/listen-live :click ".snippet .child-move-up:not(.disabled)" click>snippet-move-up)
+  "body" (ee/listen-live :click ".snippet .child-move-down:not(.disabled)" click>snippet-move-down)
   ".cancel-progress-dialog" (ee/listen :click click>cancel-progress-dialog)
   ".submit-progress-dialog" (ee/listen :click click>submit-progress-dialog)
   ".cancel-deadline-dialog" (ee/listen :click click>cancel-deadline-dialog)
@@ -571,6 +583,35 @@
 (go-forever
  (let [response (<! data/move-down-folder-eid-errors)]
    (log response)))
+
+;; Handle snippets moved up
+(go-forever
+ (let [snippet-eid (<! data/moved-up-snippet-eids)
+       panel-sel (str "#snippet-panel-" snippet-eid)
+       tree-sel (str "#snippet-node-" snippet-eid)]
+   (move-node-up panel-sel)
+   (move-node-up tree-sel)
+   (reset-move-buttons)))
+
+;; Handle snippet move up errors
+(go-forever
+ (let [response (<! data/move-up-snippet-eid-errors)]
+   (log response)))
+
+;; Handle snippets moved down
+(go-forever
+ (let [snippet-eid (<! data/moved-down-snippet-eids)
+       panel-sel (str "#snippet-panel-" snippet-eid)
+       tree-sel (str "#snippet-node-" snippet-eid)]
+   (move-node-down panel-sel)
+   (move-node-down tree-sel)
+   (reset-move-buttons)))
+
+;; Handle snippet move down errors
+(go-forever
+ (let [response (<! data/move-down-snippet-eid-errors)]
+   (log response)))
+
 
 ;; Handle snippets created
 (go-forever

@@ -280,6 +280,28 @@
   :put! (partial snippet-put! snippet-eid)
   :handle-unauthorized (fn [ctx] (friend/throw-unauthorized nil nil)))
 
+(defn snippet-move-up! [snippet-eid _]
+  (data-snippet/move-up! snippet-eid)
+  {::snippet (data-snippet/snippet-by-eid snippet-eid)})
+
+(defresource snippet-move-up [snippet-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? (partial snippet-mutation-allowed? snippet-eid)
+  :put! (partial snippet-move-up! snippet-eid)
+  :handle-created snippet-handle-created)
+
+(defn snippet-move-down! [snippet-eid _]
+  (data-snippet/move-down! snippet-eid)
+  {::snippet (data-snippet/snippet-by-eid snippet-eid)})
+
+(defresource snippet-move-down [snippet-eid]
+  :allowed-methods [:put]
+  :available-media-types ["text/html"]
+  :authorized? (partial snippet-mutation-allowed? snippet-eid)
+  :put! (partial snippet-move-down! snippet-eid)
+  :handle-created snippet-handle-created)
+
 (defroutes user-routes
 
   (GET "/" [] (projects-resource))
@@ -306,4 +328,8 @@
 
   (PUT "/folder/:folder-eid/move-down" [folder-eid] (folder-move-down (parse-long folder-eid)))
 
-  (PUT "/snippet/:snippet-eid" [snippet-eid] (snippet-resource (parse-long snippet-eid))))
+  (PUT "/snippet/:snippet-eid" [snippet-eid] (snippet-resource (parse-long snippet-eid)))
+
+  (PUT "/snippet/:snippet-eid/move-up" [snippet-eid] (snippet-move-up (parse-long snippet-eid)))
+
+  (PUT "/snippet/:snippet-eid/move-down" [snippet-eid] (snippet-move-down (parse-long snippet-eid))))

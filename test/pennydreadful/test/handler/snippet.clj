@@ -177,3 +177,152 @@
          app)
      (data-snippet/snippet-by-eid snippet-eid)))))
 
+;; PUT /snippet/:snippet-eid/move-up response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                               (find-where :name "accidental astronauts")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "accidental astronauts research")
+                               :children
+                               (find-where :name "aa folder B")
+                               :children
+                               (find-where :name "aa folder BA")
+                               :children
+                               (find-where :name "aa snippet BA2"))]
+     (-> (request :put (str "/snippet/" snippet-eid "/move-up"))
+         app)))))
+
+;; PUT /snippet/:snippet-eid/move-down response
+(expect
+ {:status 201}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                               (find-where :name "accidental astronauts")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "accidental astronauts research")
+                               :children
+                               (find-where :name "aa folder B")
+                               :children
+                               (find-where :name "aa folder BA")
+                               :children
+                               (find-where :name "aa snippet BA1"))]
+     (-> (request :put (str "/snippet/" snippet-eid "/move-down"))
+         app)))))
+
+;; Can't move-up someone else's snippet
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                               (find-where :name "condescending cougars")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "condescending cougars research")
+                               :children
+                               (find-where :name "cc folder B")
+                               :children
+                               (find-where :name "cc folder BA")
+                               :children
+                               (find-where :name "cc snippet BA2"))]
+     (-> (request :put (str "/snippet/" snippet-eid "/move-up"))
+         app)))))
+
+;; Can't move-down someone else's snippet
+(expect
+ {:status 401}
+ (in
+  (login/as-ryan
+   (let [{rhea-eid :id} (data-user/user-for-username "rhea")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid rhea-eid)
+                               (find-where :name "condescending cougars")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "condescending cougars research")
+                               :children
+                               (find-where :name "cc folder B")
+                               :children
+                               (find-where :name "cc folder BA")
+                               :children
+                               (find-where :name "cc snippet BA1"))]
+     (-> (request :put (str "/snippet/" snippet-eid "/move-down"))
+         app)))))
+
+;; PUT to /snippet/:snippet-eid/move-up mutates database correctly
+(expect
+ {:name "aa snippet BA2"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                               (find-where :name "accidental astronauts")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "accidental astronauts research")
+                               :children
+                               (find-where :name "aa folder B")
+                               :children
+                               (find-where :name "aa folder BA")
+                               :children
+                               (find-where :name "aa snippet BA2"))]
+     (-> (request :put (str "/snippet/" snippet-eid "/move-up"))
+         app)
+     (-> (data-project/projects-for-user-eid ryan-eid)
+         (find-where :name "accidental astronauts")
+         :id
+         (data-project/project-by-eid {:depth :snippet-meta})
+         :collections
+         (find-where :name "accidental astronauts research")
+         :children
+         (find-where :name "aa folder B")
+         :children
+         (find-where :name "aa folder BA")
+         :children
+         (find-where :position 0))))))
+
+;; PUT to /snippet/:snippet-eid/move-down mutates database correctly
+(expect
+ {:name "aa snippet BA2"}
+ (in
+  (login/as-ryan
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                               (find-where :name "accidental astronauts")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "accidental astronauts research")
+                               :children
+                               (find-where :name "aa folder B")
+                               :children
+                               (find-where :name "aa folder BA")
+                               :children
+                               (find-where :name "aa snippet BA1"))]
+     (-> (request :put (str "/snippet/" snippet-eid "/move-down"))
+         app)
+     (-> (data-project/projects-for-user-eid ryan-eid)
+         (find-where :name "accidental astronauts")
+         :id
+         (data-project/project-by-eid {:depth :snippet-meta})
+         :collections
+         (find-where :name "accidental astronauts research")
+         :children
+         (find-where :name "aa folder B")
+         :children
+         (find-where :name "aa folder BA")
+         :children
+         (find-where :position 0))))))

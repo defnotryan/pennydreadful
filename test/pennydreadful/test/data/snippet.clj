@@ -128,3 +128,69 @@
                       (find-where :name "aa snippet 1"))]
       (update-snippet! (assoc snippet :description "new description"))
       (snippet-by-eid (:id snippet))))))
+
+;; Move snippet up
+(expect
+ ["aa snippet BA2" "aa snippet BA1"]
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                               (find-where :name "accidental astronauts")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "accidental astronauts research")
+                               :children
+                               (find-where :name "aa folder B")
+                               :children
+                               (find-where :name "aa folder BA")
+                               :children
+                               (find-where :name "aa snippet BA2"))]
+     (move-up! snippet-eid)
+     (let [children (-> (data-project/projects-for-user-eid ryan-eid)
+                        (find-where :name "accidental astronauts")
+                        :id
+                        (data-project/project-by-eid {:depth :snippet-meta})
+                        :collections
+                        (find-where :name "accidental astronauts research")
+                        :children
+                        (find-where :name "aa folder B")
+                        :children
+                        (find-where :name "aa folder BA")
+                        :children)]
+       (->> children
+            (sort-by :position)
+            (map :name))))))
+
+;; Move snippet down
+(expect
+ ["aa snippet BA2" "aa snippet BA1"]
+ (with-populated-db
+   (let [{ryan-eid :id} (data-user/user-for-username "ryan")
+         {snippet-eid :id} (-> (data-project/projects-for-user-eid ryan-eid)
+                               (find-where :name "accidental astronauts")
+                               :id
+                               (data-project/project-by-eid {:depth :snippet-meta})
+                               :collections
+                               (find-where :name "accidental astronauts research")
+                               :children
+                               (find-where :name "aa folder B")
+                               :children
+                               (find-where :name "aa folder BA")
+                               :children
+                               (find-where :name "aa snippet BA1"))]
+     (move-down! snippet-eid)
+     (let [children (-> (data-project/projects-for-user-eid ryan-eid)
+                        (find-where :name "accidental astronauts")
+                        :id
+                        (data-project/project-by-eid {:depth :snippet-meta})
+                        :collections
+                        (find-where :name "accidental astronauts research")
+                        :children
+                        (find-where :name "aa folder B")
+                        :children
+                        (find-where :name "aa folder BA")
+                        :children)]
+       (->> children
+            (sort-by :position)
+            (map :name))))))

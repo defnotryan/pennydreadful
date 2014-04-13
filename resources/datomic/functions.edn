@@ -160,6 +160,62 @@
               (recur (clojure.zip/next n))))))))}}
 
  {:db/id #db/id[:db.part/user]
+  :db/ident :move-up-snippet-position
+  :db/fn #db/fn
+  {:lang "clojure"
+   :requires [clojure.zip]
+   :params [db snippet-eid]
+   :code
+   (map-indexed
+    (fn [idx {:keys [eid position-key]}]
+      [:db/add eid position-key idx])
+    (let [coll-children ;; children if parent is collection
+          (->> snippet-eid
+               (datomic.api/q
+                '[:find ?sibling-eid
+                  :in $ ?snippet-eid
+                  :where [?collection-eid :collection/children ?snippet-eid]
+                         [?collection-eid :collection/children ?sibling-eid]]
+                db)
+               (map first)
+               (map (partial datomic.api/entity db))
+               (sort-by #(or (:folder/position %) (:snippet/position %))))
+          folder-children ;; children if parent is folder
+          (->> snippet-eid
+               (datomic.api/q
+                '[:find ?sibling-eid
+                  :in $ ?snippet-eid
+                  :where [?folder-eid :folder/children ?snippet-eid]
+                         [?folder-eid :folder/children ?sibling-eid]]
+                db)
+               (map first)
+               (map (partial datomic.api/entity db))
+               (sort-by #(or (:folder/position %) (:snippet/position %))))
+          children (concat coll-children folder-children)]
+      (if (= snippet-eid (-> children first :db/id))
+        (map
+         (fn [child]
+           {:eid (:db/id child)
+            :position-key (if (contains? child :folder/name)
+                            :folder/position
+                            :snippet/position)})
+         children)
+        (let [vz (clojure.zip/vector-zip (vec children))]
+          (loop [n (clojure.zip/down vz)]
+            (if (= snippet-eid (-> n clojure.zip/node :db/id))
+              (map
+               (fn [child]
+                 {:eid (:db/id child)
+                  :position-key (if (contains? child :folder/name)
+                                  :folder/position
+                                  :snippet/position)})
+               (-> n
+                   clojure.zip/remove
+                   (clojure.zip/insert-left {:db/id snippet-eid :snippet/name :dummy})
+                   clojure.zip/root))
+              (recur (clojure.zip/next n))))))))}}
+
+ {:db/id #db/id[:db.part/user]
   :db/ident :move-down-collection-position
   :db/fn #db/fn
   {:lang "clojure"
@@ -249,4 +305,62 @@
                   (clojure.zip/insert-right {:db/id folder-eid :folder/name :dummy})
                   clojure.zip/root))
              (recur (clojure.zip/next n))))))))}}
+
+ {:db/id #db/id[:db.part/user]
+  :db/ident :move-down-snippet-position
+  :db/fn #db/fn
+  {:lang "clojure"
+   :requires [clojure.zip]
+   :params [db snippet-eid]
+   :code
+   (map-indexed
+    (fn [idx {:keys [eid position-key]}]
+      [:db/add eid position-key idx])
+    (let [coll-children
+          (->> snippet-eid
+               (datomic.api/q
+                '[:find ?sibling-eid
+                  :in $ ?snippet-eid
+                  :where [?collection-eid :collection/children ?snippet-eid]
+                         [?collection-eid :collection/children ?sibling-eid]]
+                db)
+               (map first)
+               (map (partial datomic.api/entity db))
+               (sort-by #(or (:folder/position %) (:snippet/position %))))
+          folder-children
+          (->> snippet-eid
+               (datomic.api/q
+                '[:find ?sibling-eid
+                  :in $ ?snippet-eid
+                  :where [?parent-eid :folder/children ?snippet-eid]
+                         [?parent-eid :folder/children ?sibling-eid]]
+                db)
+               (map first)
+               (map (partial datomic.api/entity db))
+               (sort-by #(or (:folder/position %) (:snippet/position %))))
+          children (concat coll-children folder-children)]
+      (if (= snippet-eid (-> children last :db/id))
+        (map
+         (fn [child]
+           {:eid (:db/id child)
+            :position-key (if (contains? child :folder/name)
+                            :folder/position
+                            :snippet/position)})
+         children)
+        (let [vz (clojure.zip/vector-zip (vec children))]
+          (loop [n (clojure.zip/down vz)]
+            (if (= snippet-eid (-> n clojure.zip/node :db/id))
+              (map
+               (fn [child]
+                 {:eid (:db/id child)
+                  :position-key (if (contains? child :folder/name)
+                                  :folder/position
+                                  :snippet/position)})
+               (-> n
+                   clojure.zip/remove
+                   clojure.zip/next
+                   (clojure.zip/insert-right {:db/id snippet-eid :snippet/name :dummy})
+                   clojure.zip/root))
+              (recur (clojure.zip/next n))))))))}}
+
  ]

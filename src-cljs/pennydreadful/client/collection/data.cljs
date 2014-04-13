@@ -36,6 +36,14 @@
 (def updated-snippet-meta (chan 3))
 (def update-snippet-meta-errors (chan 3))
 
+(def snippet-eids-to-move-up (chan 1))
+(def moved-up-snippet-eids (chan 1))
+(def move-up-snippet-eid-errors (chan 1))
+
+(def snippet-eids-to-move-down (chan 1))
+(def moved-down-snippet-eids (chan 1))
+(def move-down-snippet-eid-errors (chan 1))
+
 ;; PUT collection metadata updates in collection-meta-to-update
 (go-forever
  (let [collection (<! collection-meta-to-update)]
@@ -100,6 +108,32 @@
                     (go (>! moved-down-folder-eids folder-eid)))
          :error-handler (fn [resp]
                           (go (>! move-down-folder-eid-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT snippet-eids for moving up
+(go-forever
+ (let [snippet-eid (<! snippet-eids-to-move-up)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/snippet/" snippet-eid "/move-up")
+        {:format :raw
+         :response-format :raw
+         :handler (fn [_]
+                    (go (>! moved-up-snippet-eids snippet-eid)))
+         :error-handler (fn [resp]
+                          (go (>! move-up-snippet-eid-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT snippet-eids for moving down
+(go-forever
+ (let [snippet-eid (<! snippet-eids-to-move-down)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/snippet/" snippet-eid "/move-down")
+        {:format :raw
+         :response-format :raw
+         :handler (fn [_]
+                    (go (>! moved-down-snippet-eids snippet-eid)))
+         :error-handler (fn [resp]
+                          (go (>! move-down-snippet-eid-errors resp)))
          :finally #(swap! util/outstanding-request-count dec)})))
 
 ;; POST new snippets in snippets-to-create channel

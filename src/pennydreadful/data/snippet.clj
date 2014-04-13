@@ -72,3 +72,9 @@
    (case depth
      :snippet-meta (-> @data/conn d/db (d/entity snippet-eid) hydrate-lite)
      :snippet (-> @data/conn d/db (d/entity snippet-eid) hydrate))))
+
+(defn move-up! [snippet-eid]
+  @(d/transact @data/conn [[:move-up-snippet-position snippet-eid]]))
+
+(defn move-down! [snippet-eid]
+  @(d/transact @data/conn [[:move-down-snippet-position snippet-eid]]))

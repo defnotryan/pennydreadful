@@ -512,7 +512,7 @@
        (when-not (= folder-name current-name)
          (ef/at selector (ef/content folder-name)))
        (ef/at
-        (str "#folder-node-" folder-eid " > .folder-name") (ef/content folder-name))))
+        (str "#folder-node-" folder-eid " > div > .folder-name") (ef/content folder-name))))
    (when-let [folder-description (:description folder)]
      (swap! unsaved-changes disj [:folder-description folder-eid])
      (let [selector (str "#folder-panel-" folder-eid " .folder-description")
@@ -551,7 +551,7 @@
        (when-not (= snippet-name current-name)
          (ef/at selector (ef/content snippet-name)))
        (ef/at
-        (str "#snippet-node-" snippet-eid " > .snippet-name") (ef/content snippet-name))))
+        (str "#snippet-node-" snippet-eid " > div > .snippet-name") (ef/content snippet-name))))
    (when-let [snippet-description (:description snippet)]
      (swap! unsaved-changes disj [:snippet-description snippet-eid])
      (let [selector (str "#snippet-panel-" snippet-eid " .snippet-description")

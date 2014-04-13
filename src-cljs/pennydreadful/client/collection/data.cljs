@@ -20,6 +20,14 @@
 (def updated-folder-meta (chan 3))
 (def update-folder-meta-errors (chan 3))
 
+(def folder-eids-to-move-up (chan 1))
+(def moved-up-folder-eids (chan 1))
+(def move-up-folder-eid-errors (chan 1))
+
+(def folder-eids-to-move-down (chan 1))
+(def moved-down-folder-eids (chan 1))
+(def move-down-folder-eid-errors (chan 1))
+
 (def snippets-to-create (chan 1))
 (def created-snippets (chan 1))
 (def create-snippet-errors (chan 1))
@@ -66,6 +74,32 @@
          :params folder
          :handler (fn [_] (go (>! updated-folder-meta folder)))
          :error-handler (fn [resp] (go (>! update-folder-meta-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT folder-eids for moving up
+(go-forever
+ (let [folder-eid (<! folder-eids-to-move-up)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/folder/" folder-eid "/move-up")
+        {:format :raw
+         :response-format :raw
+         :handler (fn [_]
+                    (go (>! moved-up-folder-eids folder-eid)))
+         :error-handler (fn [resp]
+                          (go (>! move-up-folder-eid-errors resp)))
+         :finally #(swap! util/outstanding-request-count dec)})))
+
+;; PUT folder-eids for moving down
+(go-forever
+ (let [folder-eid (<! folder-eids-to-move-down)]
+   (swap! util/outstanding-request-count inc)
+   (PUT (str "/folder/" folder-eid "/move-down")
+        {:format :raw
+         :response-format :raw
+         :handler (fn [_]
+                    (go (>! moved-down-folder-eids folder-eid)))
+         :error-handler (fn [resp]
+                          (go (>! move-down-folder-eid-errors resp)))
          :finally #(swap! util/outstanding-request-count dec)})))
 
 ;; POST new snippets in snippets-to-create channel

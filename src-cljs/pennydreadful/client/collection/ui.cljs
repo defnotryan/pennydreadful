@@ -150,6 +150,12 @@
 (defaction enable-new-snippet-button []
   "#create-snippet-button" (ef/remove-class "disabled"))
 
+(defaction reset-move-buttons []
+  ".child-move-up" (ef/remove-class "disabled")
+  ".child-move-down" (ef/remove-class "disabled")
+  "#children-list > .child:first-child .child-move-up" (ef/add-class "disabled")
+  "#children-list > .child:last-child .child-move-down" (ef/add-class "disabled"))
+
 (defaction disable-word-count-target-input []
   "#target-manual-value" (ef/set-attr :disabled "disabled"))
 
@@ -387,11 +393,23 @@
 (defn change>deadline-manual-value [event]
   (reset! new-deadline-raw (-> event .-target .-value)))
 
+(defn click>folder-move-up [event]
+  (go
+   (let [folder-eid (extract-id (.-target event))]
+     (>! data/folder-eids-to-move-up folder-eid))))
+
+(defn click>folder-move-down [event]
+  (go
+   (let [folder-eid (extract-id (.-target event))]
+     (>! data/folder-eids-to-move-down folder-eid))))
+
 (defaction setup-events []
   "body" (ee/listen-live :input ".folder-title" input>folder-title)
   "body" (ee/listen-live :input ".folder-description" input>folder-description)
   "body" (ee/listen-live :input ".snippet-title" input>snippet-title)
   "body" (ee/listen-live :input ".snippet-description" input>snippet-description)
+  "body" (ee/listen-live :click ".folder .child-move-up:not(.disabled)" click>folder-move-up)
+  "body" (ee/listen-live :click ".folder .child-move-down:not(.disabled)" click>folder-move-down)
   ".cancel-progress-dialog" (ee/listen :click click>cancel-progress-dialog)
   ".submit-progress-dialog" (ee/listen :click click>submit-progress-dialog)
   ".cancel-deadline-dialog" (ee/listen :click click>cancel-deadline-dialog)
@@ -459,6 +477,7 @@
            (ef/at "#deadline-reminder" (ef/set-attr :title (.format deadline "D MMMM YYYY")))))
   (cell= (ef/at "#deadline-reminder" (some-> deadline .fromNow ef/content)))
   (setup-events)
+  (reset-move-buttons)
   (log "pennydreadful.client.collection.ui ready"))
 
 (defn init []
@@ -525,6 +544,33 @@
  (let [response (<! data/update-folder-meta-errors)]
    (log response)))
 
+;; Handle folders moved up
+(go-forever
+ (let [folder-eid (<! data/moved-up-folder-eids)
+       panel-sel (str "#folder-panel-" folder-eid)
+       tree-sel (str "#folder-node-" folder-eid)]
+   (move-node-up panel-sel)
+   (move-node-up tree-sel)
+   (reset-move-buttons)))
+
+;; Handle folder move up errors
+(go-forever
+ (let [response (<! data/move-up-folder-eid-errors)]
+   (log response)))
+
+;; Handle folders moved down
+(go-forever
+ (let [folder-eid (<! data/moved-down-folder-eids)
+       panel-sel (str "#folder-panel-" folder-eid)
+       tree-sel (str "#folder-node-" folder-eid)]
+   (move-node-down panel-sel)
+   (move-node-down tree-sel)
+   (reset-move-buttons)))
+
+;; Handle folder move down errors
+(go-forever
+ (let [response (<! data/move-down-folder-eid-errors)]
+   (log response)))
 
 ;; Handle snippets created
 (go-forever
